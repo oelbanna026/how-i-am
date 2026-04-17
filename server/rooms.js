@@ -382,6 +382,7 @@ class RoomManager {
       cardsByPlayerId,
       questions: [],
       openQuestionId: null,
+      hintsUsedByPlayerId: new Set(),
       skipsByPlayerId: new Map(),
       guessesThisTurnByPlayerId: new Map(),
       turnsTaken: 0,
@@ -541,6 +542,28 @@ class RoomManager {
     }
 
     return { yesCount, noCount, complete, majority };
+  }
+
+  useHint({ code, playerId }) {
+    const room = this.rooms.get(code);
+    if (!room || !room.game) throw new Error('ROOM_NOT_FOUND');
+    if (room.flow !== 'playing') throw new Error('GAME_NOT_PLAYING');
+    if (room.game.winnerId) throw new Error('GAME_ENDED');
+    if (playerId !== room.game.currentTurnPlayerId) throw new Error('NOT_YOUR_TURN');
+    if (room.game.hintsUsedByPlayerId?.has(playerId)) throw new Error('HINT_ALREADY_USED');
+
+    const target = room.game.cardsByPlayerId.get(playerId);
+    if (!target) throw new Error('NO_CARD');
+
+    const type = Math.random() < 0.5 ? 'category' : 'first_letter';
+    const value =
+      type === 'category'
+        ? String(target.category ?? '')
+        : String(target.name ?? '').trim().slice(0, 1);
+    room.game.hintsUsedByPlayerId.add(playerId);
+
+    this.emit(room.code, 'hintUsed', { roomCode: room.code, playerId, type, value });
+    return { type, value };
   }
 
   makeGuess({ code, playerId, guess }) {
