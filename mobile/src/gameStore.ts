@@ -54,6 +54,7 @@ export type GameStoreState = {
     accent: 'primary' | 'tertiary' | 'secondary' | 'error' | 'custom';
   };
   lastReaction: { emoji: string; fromId: string; fromName: string; ts: number } | null;
+  lastToast: { text: string; ts: number } | null;
   profile: { name: string; avatarId: string; coins: number };
   unlockedCategories: string[];
   messages: Message[];
@@ -597,6 +598,7 @@ class Store {
       reportTargetUserId: null,
       ui: { language: 'ar', sound: true, voice: true, haptics: true, reduceMotion: false, profanityFilter: true, accent: 'primary' },
       lastReaction: null,
+      lastToast: null,
       profile: { name: 'Guest', avatarId: 'a1', coins: 100 },
       unlockedCategories: ['All'],
       messages: [],
@@ -760,7 +762,8 @@ export const gameActions = {
             gameState: normalizedPayload,
             timer: buildTimerFromPayload(payload),
             players: normalizedPlayers ?? store.getState().players,
-            roundResult: null
+            roundResult: null,
+            lastToast: null
           });
         },
         onQuestionReceived: (payload) => {
@@ -795,6 +798,18 @@ export const gameActions = {
                   };
                 })
               : prevQs;
+
+            const meId = String(s.userId ?? '');
+            const answeredBy = String(payload?.answeredBy ?? '');
+            const updatedQ = qid ? nextQs.find((q: any) => String(q?.id ?? '') === qid) : null;
+            const askedBy = String(updatedQ?.askedBy ?? '');
+            const isMeAnswerer = meId && answeredBy && meId === answeredBy;
+            const isMeAsker = meId && askedBy && meId === askedBy;
+            const majority = String(payload?.majority ?? '');
+            const majorityAr = majority === 'YES' ? 'أيوه' : majority === 'NO' ? 'لأ' : null;
+            const toastText =
+              isMeAnswerer ? 'تم إرسال إجابتك' : payload?.complete && isMeAsker && majorityAr ? `إجابة الخصم: ${majorityAr}` : null;
+
             return {
               ...s,
               gameState: prev
@@ -805,6 +820,7 @@ export const gameActions = {
                   }
                 : prev,
               roundResult: null,
+              lastToast: toastText ? { text: toastText, ts: nowMs() } : s.lastToast,
               messages: [
                 {
                   id: id(),
@@ -837,25 +853,38 @@ export const gameActions = {
         onGuessResult: (payload) => {
           void audioService.playSFX(payload?.correct ? 'correct_guess' : 'wrong_guess').catch(() => null);
           void voiceService.playVoice(payload?.correct ? 'correct' : 'wrong');
-          store.setState({
-            gameState: store.getState().gameState
-              ? { ...store.getState().gameState, scores: payload?.scores ?? store.getState().gameState?.scores }
-              : store.getState().gameState,
-            roundResult: payload?.correct
-              ? {
-                  kind: 'guess',
-                  winnerId: payload?.playerId ?? null,
-                  winnerName:
-                    store.getState().players.find((p: any) => String(p.id) === String(payload?.playerId))?.name ??
-                    'حد',
-                  identity: store.getState().gameState?.myCard?.name ?? null,
-                  pointsDelta: payload?.scoreDelta ?? null
-                }
-              : store.getState().roundResult,
-            messages: [
-              { id: id(), ts: nowMs(), type: 'guess', text: payload?.correct ? 'Correct guess' : 'Wrong guess', payload },
-              ...store.getState().messages
-            ].slice(0, 100)
+          store.setState((s) => {
+            const pid = String(payload?.playerId ?? '');
+            const winnerName = s.players.find((p: any) => String(p.id) === pid)?.name ?? 'حد';
+            const meId = String(s.userId ?? '');
+            const correct = Boolean(payload?.correct);
+            const toastText = correct
+              ? pid && meId && pid === meId
+                ? 'تخمين صحيح!'
+                : `${winnerName} عرف الإجابة!`
+              : pid && meId && pid === meId
+                ? 'تخمين غلط'
+                : `${winnerName} خمن غلط`;
+            const targetName = typeof payload?.target?.name === 'string' ? payload.target.name : null;
+            const targetImagePath = typeof payload?.target?.imagePath === 'string' ? payload.target.imagePath : null;
+            const imageUri = targetImagePath ? toAssetUrl(s.serverUrl, targetImagePath) : null;
+            return {
+              ...s,
+              gameState: s.gameState ? { ...(s.gameState as any), scores: payload?.scores ?? (s.gameState as any).scores } : s.gameState,
+              lastToast: { text: toastText, ts: nowMs() },
+              roundResult:
+                correct && targetName
+                  ? {
+                      kind: 'guess',
+                      winnerId: pid || null,
+                      winnerName,
+                      identity: targetName,
+                      pointsDelta: payload?.scoreDelta ?? null,
+                      imageUri
+                    }
+                  : null,
+              messages: [{ id: id(), ts: nowMs(), type: 'guess', text: correct ? 'Correct guess' : 'Wrong guess', payload }, ...s.messages].slice(0, 100)
+            };
           });
         },
         onGameEnd: (payload) => {
