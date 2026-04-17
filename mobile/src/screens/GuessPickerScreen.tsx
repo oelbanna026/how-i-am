@@ -8,6 +8,8 @@ export function GuessPickerScreen({ onClose }: { onClose: () => void }) {
   const [selected, setSelected] = useState<string | null>(null);
   const serverUrl = useGameStore((s) => s.serverUrl);
   const offline = String(useGameStore((s) => s.currentRoom?.roomCode ?? '')) === 'OFFLINE';
+  const questionsCount = useGameStore((s) => (Array.isArray((s.gameState as any)?.questions) ? (s.gameState as any).questions.length : 0));
+  const minQuestionsBeforeGuess = offline ? 0 : 3;
 
   const injected = useMemo(() => {
     return `
@@ -206,18 +208,29 @@ true;
       if (e.text.includes('ثبّت التخمين')) {
         if (!selected) return;
         try {
+          if (!offline && questionsCount < minQuestionsBeforeGuess) {
+            const remaining = Math.max(0, minQuestionsBeforeGuess - questionsCount);
+            Alert.alert('لا يمكن التخمين الآن', `لازم تسأل ${remaining} سؤال قبل التخمين.`);
+            return;
+          }
           const res = await gameActions.makeGuess(selected);
           if (!res.correct) Alert.alert('خطأ', 'تخمين غلط! هتتخصم نقاط + يتفوت دورك الجاي.');
           onClose();
         } catch (err: any) {
-          Alert.alert('خطأ', String(err?.message ?? err));
+          const msg = String(err?.message ?? err);
+          if (msg.toUpperCase().includes('NEED_MORE_QUESTIONS')) {
+            const remaining = Math.max(0, minQuestionsBeforeGuess - questionsCount);
+            Alert.alert('لا يمكن التخمين الآن', `لازم تسأل ${remaining} سؤال قبل التخمين.`);
+            return;
+          }
+          Alert.alert('خطأ', msg);
         }
         return;
       }
       const g = extractGuess(e.text);
       if (g) setSelected(g);
     },
-    [extractGuess, onClose, selected]
+    [extractGuess, minQuestionsBeforeGuess, offline, onClose, questionsCount, selected]
   );
 
   return (
