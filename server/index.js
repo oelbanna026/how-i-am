@@ -8,12 +8,22 @@ const { createPersistence } = require('./mongo');
 const { RoomManager } = require('./rooms');
 const { VoiceManager, voiceRoomName } = require('./voice');
 const PlayerProfile = require('./models/PlayerProfile');
+const FriendRequest = require('./models/FriendRequest');
 const path = require('path');
 const Card = require('./models/Card');
 const Pack = require('./models/Pack');
+const { nanoid } = require('nanoid');
+const GameRecord = require('./models/GameRecord');
 const { VALID_CATEGORIES, ensureDefaultPacks } = require('./services/cardsService');
 const gameService = require('./services/gameService');
 const cardsCache = require('./cardsCache');
+const { createRedisClient } = require('./redisClient');
+const { addChatMessage, getRecentChat } = require('./services/chatService');
+const { indexRoom, removeRoom, listPublicRooms } = require('./services/roomIndex');
+const { sanitizeText } = require('./services/profanityFilter');
+const { signAccessToken } = require('./services/authTokens');
+const { verifyGoogleIdToken, verifyAppleIdToken } = require('./services/providerTokens');
+const { authMiddleware } = require('./middleware/auth');
 
 const PORT = Number(process.env.PORT || 3001);
 
@@ -38,6 +48,11 @@ async function main() {
   const io = new Server(httpServer, {
     cors: { origin: true, credentials: true }
   });
+
+  const redis = createRedisClient();
+  try {
+    if (typeof redis.connect === 'function') await redis.connect();
+  } catch {}
 
   const persistence = await createPersistence({ mongoUri: process.env.MONGODB_URI });
 
@@ -129,6 +144,147 @@ async function main() {
 
   app.use(express.json({ limit: '1mb' }));
 
+  app.post('/auth/guest', async (req, res) => {
+    try {
+      const deviceId = String(req.body?.deviceId ?? '').trim() || `d_${nanoid(10)}`;
+      const username = sanitizeText(String(req.body?.username ?? 'Guest').trim()).slice(0, 24) || 'Guest';
+      const avatarId = String(req.body?.avatar ?? req.body?.avatarId ?? 'a1').trim() || 'a1';
+      const age = req.body?.age !== undefined ? Number(req.body.age) : null;
+      const country = req.body?.country !== undefined ? String(req.body.country ?? '').trim().slice(0, 2).toUpperCase() : null;
+
+      let doc = await PlayerProfile.findOne({ deviceId }).lean();
+      if (!doc) {
+        const playerId = `u_${nanoid(14)}`;
+        doc = await PlayerProfile.findOneAndUpdate(
+          { playerId },
+          {
+            $set: {
+              playerId,
+              deviceId,
+              name: username,
+              avatar: { id: avatarId },
+              age: Number.isFinite(age) ? Math.max(5, Math.min(120, Math.floor(age))) : null,
+              country: country || null
+            }
+          },
+          { upsert: true, new: true }
+        ).lean();
+      }
+      const token = await signAccessToken({ userId: doc.playerId });
+      return res.json({
+        ok: true,
+        token,
+        user: {
+          id: doc.playerId,
+          username: doc.name,
+          avatar: doc.avatar ?? { id: 'a1' },
+          age: doc.age ?? null,
+          country: doc.country ?? null,
+          coins: Number(doc.coins ?? 0),
+          friends: Array.isArray(doc.friends) ? doc.friends : [],
+          createdAt: doc.createdAt ?? null
+        }
+      });
+    } catch (e) {
+      return res.status(400).json({ ok: false, error: String(e?.message ?? e) });
+    }
+  });
+
+  app.post('/auth/google', async (req, res) => {
+    try {
+      const idToken = String(req.body?.idToken ?? '').trim();
+      const verified = await verifyGoogleIdToken(idToken);
+      let doc = await PlayerProfile.findOne({ 'providers.google.providerUserId': verified.providerUserId }).lean();
+      if (!doc) {
+        const playerId = `u_${nanoid(14)}`;
+        const username = sanitizeText(String(req.body?.username ?? 'Guest').trim()).slice(0, 24) || 'Guest';
+        const avatarId = String(req.body?.avatar ?? req.body?.avatarId ?? 'a1').trim() || 'a1';
+        doc = await PlayerProfile.findOneAndUpdate(
+          { playerId },
+          {
+            $set: {
+              playerId,
+              deviceId: playerId,
+              name: username,
+              avatar: { id: avatarId },
+              providers: { google: verified }
+            }
+          },
+          { upsert: true, new: true }
+        ).lean();
+      }
+      const token = await signAccessToken({ userId: doc.playerId });
+      return res.json({ ok: true, token, userId: doc.playerId });
+    } catch (e) {
+      return res.status(400).json({ ok: false, error: String(e?.message ?? e) });
+    }
+  });
+
+  app.post('/auth/apple', async (req, res) => {
+    try {
+      const idToken = String(req.body?.idToken ?? '').trim();
+      const verified = await verifyAppleIdToken(idToken);
+      let doc = await PlayerProfile.findOne({ 'providers.apple.providerUserId': verified.providerUserId }).lean();
+      if (!doc) {
+        const playerId = `u_${nanoid(14)}`;
+        const username = sanitizeText(String(req.body?.username ?? 'Guest').trim()).slice(0, 24) || 'Guest';
+        const avatarId = String(req.body?.avatar ?? req.body?.avatarId ?? 'a1').trim() || 'a1';
+        doc = await PlayerProfile.findOneAndUpdate(
+          { playerId },
+          {
+            $set: {
+              playerId,
+              deviceId: playerId,
+              name: username,
+              avatar: { id: avatarId },
+              providers: { apple: verified }
+            }
+          },
+          { upsert: true, new: true }
+        ).lean();
+      }
+      const token = await signAccessToken({ userId: doc.playerId });
+      return res.json({ ok: true, token, userId: doc.playerId });
+    } catch (e) {
+      return res.status(400).json({ ok: false, error: String(e?.message ?? e) });
+    }
+  });
+
+  app.get('/profile', authMiddleware, async (req, res) => {
+    try {
+      const userId = String(req.userId ?? '').trim();
+      if (!userId) return res.status(401).json({ ok: false, error: 'UNAUTHORIZED' });
+      const doc = await PlayerProfile.findOne({ playerId: userId }).lean();
+      if (!doc) return res.status(404).json({ ok: false, error: 'NOT_FOUND' });
+      return res.json({
+        ok: true,
+        profile: { id: doc.playerId, name: doc.name, avatar: doc.avatar ?? { id: 'a1' }, age: doc.age ?? null, country: doc.country ?? null, coins: doc.coins ?? 0 }
+      });
+    } catch (e) {
+      return res.status(500).json({ ok: false, error: String(e?.message ?? e) });
+    }
+  });
+
+  app.put('/profile/update', authMiddleware, async (req, res) => {
+    try {
+      const userId = String(req.userId ?? '').trim();
+      if (!userId) return res.status(401).json({ ok: false, error: 'UNAUTHORIZED' });
+      const name = req.body?.username !== undefined ? sanitizeText(String(req.body.username ?? '').trim()).slice(0, 24) : undefined;
+      const avatarId = req.body?.avatar !== undefined ? String(req.body.avatar ?? '').trim() : req.body?.avatarId !== undefined ? String(req.body.avatarId ?? '').trim() : undefined;
+      const age = req.body?.age !== undefined ? Number(req.body.age) : undefined;
+      const country = req.body?.country !== undefined ? String(req.body.country ?? '').trim().slice(0, 2).toUpperCase() : undefined;
+      const update = {};
+      if (name !== undefined && name) update.name = name;
+      if (avatarId !== undefined && avatarId) update.avatar = { id: avatarId };
+      if (age !== undefined) update.age = Number.isFinite(age) ? Math.max(5, Math.min(120, Math.floor(age))) : null;
+      if (country !== undefined) update.country = country || null;
+      const doc = await PlayerProfile.findOneAndUpdate({ playerId: userId }, { $set: update }, { new: true }).lean();
+      return res.json({ ok: true, profile: { id: doc.playerId, name: doc.name, avatar: doc.avatar ?? { id: 'a1' }, age: doc.age ?? null, country: doc.country ?? null } });
+    } catch (e) {
+      return res.status(400).json({ ok: false, error: String(e?.message ?? e) });
+    }
+  });
+
   app.get('/cards', async (req, res) => {
     try {
       const category = req.query?.category ? String(req.query.category).toLowerCase() : null;
@@ -211,6 +367,86 @@ async function main() {
     }
   });
 
+  app.get('/rooms', async (_req, res) => {
+    try {
+      const rooms = await listPublicRooms(redis);
+      return res.json({ ok: true, rooms });
+    } catch (e) {
+      return res.status(500).json({ ok: false, error: String(e?.message ?? e) });
+    }
+  });
+
+  app.get('/leaderboard', async (_req, res) => {
+    try {
+      const rows = await GameRecord.aggregate([
+        { $group: { _id: '$winnerId', wins: { $sum: 1 } } },
+        { $sort: { wins: -1 } },
+        { $limit: 100 }
+      ]);
+      const ids = rows.map((r) => String(r._id ?? '')).filter(Boolean);
+      const profiles = await PlayerProfile.find({ playerId: { $in: ids } }).lean();
+      const byId = new Map(profiles.map((p) => [String(p.playerId), p]));
+      const leaderboard = rows.map((r, i) => {
+        const id = String(r._id ?? '');
+        const p = byId.get(id);
+        return {
+          userId: id,
+          wins: Number(r.wins ?? 0),
+          losses: 0,
+          rank: i + 1,
+          name: p?.name ?? id.slice(0, 6),
+          avatarId: String(p?.avatar?.id ?? 'a1'),
+          country: p?.country ?? null
+        };
+      });
+      return res.json({ ok: true, leaderboard });
+    } catch (e) {
+      return res.status(500).json({ ok: false, error: String(e?.message ?? e) });
+    }
+  });
+
+  app.post('/friends/request', authMiddleware, async (req, res) => {
+    try {
+      const userId = String(req.userId ?? '').trim();
+      const friendId = String(req.body?.friendId ?? '').trim();
+      if (!userId) return res.status(401).json({ ok: false, error: 'UNAUTHORIZED' });
+      if (!friendId || friendId === userId) return res.status(400).json({ ok: false, error: 'INVALID_FRIEND' });
+      await FriendRequest.findOneAndUpdate(
+        { userId, friendId },
+        { $set: { userId, friendId, status: 'pending' } },
+        { upsert: true, new: true }
+      ).lean();
+      return res.json({ ok: true });
+    } catch (e) {
+      return res.status(400).json({ ok: false, error: String(e?.message ?? e) });
+    }
+  });
+
+  app.post('/friends/respond', authMiddleware, async (req, res) => {
+    try {
+      const me = String(req.userId ?? '').trim();
+      const userId = String(req.body?.userId ?? '').trim();
+      const action = String(req.body?.action ?? '').trim().toLowerCase();
+      if (!me) return res.status(401).json({ ok: false, error: 'UNAUTHORIZED' });
+      if (!userId || userId === me) return res.status(400).json({ ok: false, error: 'INVALID_REQUEST' });
+      if (action !== 'accept' && action !== 'reject') return res.status(400).json({ ok: false, error: 'INVALID_ACTION' });
+      const status = action === 'accept' ? 'accepted' : 'rejected';
+      const reqDoc = await FriendRequest.findOneAndUpdate(
+        { userId, friendId: me },
+        { $set: { status } },
+        { new: true }
+      ).lean();
+      if (!reqDoc) return res.status(404).json({ ok: false, error: 'NOT_FOUND' });
+      if (status === 'accepted') {
+        await PlayerProfile.updateOne({ playerId: me }, { $addToSet: { friends: userId } }).catch(() => null);
+        await PlayerProfile.updateOne({ playerId: userId }, { $addToSet: { friends: me } }).catch(() => null);
+      }
+      return res.json({ ok: true, status });
+    } catch (e) {
+      return res.status(400).json({ ok: false, error: String(e?.message ?? e) });
+    }
+  });
+
   app.get('/profile/:playerId', async (req, res) => {
     try {
       const playerId = String(req.params.playerId ?? '').trim();
@@ -286,6 +522,9 @@ async function main() {
     const state = roomManager.roomState(code);
     if (!state) return;
     io.to(code).emit('roomUpdate', state);
+    try {
+      await indexRoom(redis, state);
+    } catch {}
   }
 
   async function emitGameStart(code) {
@@ -349,6 +588,10 @@ async function main() {
         socket.join(room.code);
 
         await emitRoomUpdate(room.code);
+        try {
+          const chat = await getRecentChat(redis, { roomCode: room.code });
+          socket.emit('chatHistory', { roomCode: room.code, messages: chat });
+        } catch {}
         let voice = null;
         if (voiceConfigured) {
           try {
@@ -384,6 +627,10 @@ async function main() {
         if (room?.flow === 'playing') {
           socket.emit('turnUpdate', roomManager.gameStateForViewer(room, userId, { revealSelf: false }));
         }
+        try {
+          const chat = await getRecentChat(redis, { roomCode: code });
+          socket.emit('chatHistory', { roomCode: code, messages: chat });
+        } catch {}
         let voice = null;
         if (voiceConfigured) {
           try {
@@ -407,6 +654,12 @@ async function main() {
           socket.leave(code);
           socket.data.roomCode = null;
           await emitRoomUpdate(code);
+          const room = roomManager.getRoom(code);
+          if (!room) {
+            try {
+              await removeRoom(redis, code);
+            } catch {}
+          }
         }
         if (socket.data.voiceRoomCode) {
           const vCode = socket.data.voiceRoomCode;
@@ -535,6 +788,30 @@ async function main() {
         if (!emoji) throw new Error('MISSING_EMOJI');
         io.to(code).emit('reaction', { roomCode: code, userId, emoji, ts: Date.now() });
         if (typeof ack === 'function') ack({ ok: true });
+      } catch (e) {
+        if (typeof ack === 'function') ack({ ok: false, error: String(e?.message ?? e) });
+      }
+    });
+
+    socket.on('sendMessage', async (payload, ack) => {
+      try {
+        const { code, userId, room } = requireInRoom();
+        const p = room.players.get(userId);
+        const senderName = String(p?.name ?? payload?.senderName ?? '').trim();
+        const message = String(payload?.message ?? '').trim();
+        const msg = await addChatMessage(redis, { roomCode: code, senderId: userId, senderName, message });
+        io.to(code).emit('chatMessage', { roomCode: code, ...msg });
+        if (typeof ack === 'function') ack({ ok: true });
+      } catch (e) {
+        if (typeof ack === 'function') ack({ ok: false, error: String(e?.message ?? e) });
+      }
+    });
+
+    socket.on('useHint', async (_payload, ack) => {
+      try {
+        const { code, userId } = requireInRoom();
+        const result = roomManager.useHint({ code, playerId: userId });
+        if (typeof ack === 'function') ack({ ok: true, ...result });
       } catch (e) {
         if (typeof ack === 'function') ack({ ok: false, error: String(e?.message ?? e) });
       }
