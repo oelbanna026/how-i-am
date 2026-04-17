@@ -1,0 +1,287 @@
+{
+  "count": 47,
+  "cards": [
+    {
+      "category": "fruit",
+      "slug": "banana",
+      "name": "موز",
+      "imagePath": "/assets/fruits/fruit_banana_01.png"
+    },
+    {
+      "category": "vegetable",
+      "slug": "pepper",
+      "name": "فلفل",
+      "imagePath": "/assets/vegetables/vegetable_pepper_01.png"
+    },
+    {
+      "category": "vegetable",
+      "slug": "broccoli",
+      "name": "بروكلي",
+      "imagePath": "/assets/vegetables/vegetable_broccoli_01.png"
+    },
+    {
+      "category": "fruit",
+      "slug": "grapes",
+      "name": "عنب",
+      "imagePath": "/assets/fruits/fruit_grapes_01.png"
+    },
+    {
+      "category": "vegetable",
+      "slug": "carrot",
+      "name": "جزر",
+      "imagePath": "/assets/vegetables/vegetable_carrot_01.png"
+    },
+    {
+      "category": "animal",
+      "slug": "cat",
+      "name": "قطة",
+      "imagePath": "/assets/animals/animal_cat_01.png"
+    },
+    {
+      "category": "fruit",
+      "slug": "cherry",
+      "name": "كرز",
+      "imagePath": "/assets/fruits/fruit_cherry_01.png"
+    },
+    {
+      "category": "object",
+      "slug": "alarm_clock",
+      "name": "ساعة منبه",
+      "imagePath": "/assets/objects/object_alarm_clock_01.png"
+    },
+    {
+      "category": "food",
+      "slug": "croissant",
+      "name": "كرواسون",
+      "imagePath": "/assets/foods/food_croissant_01.png"
+    },
+    {
+      "category": "vegetable",
+      "slug": "cucumber",
+      "name": "خيار",
+      "imagePath": "/assets/vegetables/vegetable_cucumber_01.png"
+    },
+    {
+      "category": "food",
+      "slug": "cupcake",
+      "name": "كب كيك",
+      "imagePath": "/assets/foods/food_cupcake_01.png"
+    },
+    {
+      "category": "animal",
+      "slug": "dog",
+      "name": "كلب",
+      "imagePath": "/assets/animals/animal_dog_01.png"
+    },
+    {
+      "category": "food",
+      "slug": "donut",
+      "name": "دونات",
+      "imagePath": "/assets/foods/food_donut_01.png"
+    },
+    {
+      "category": "vegetable",
+      "slug": "corn",
+      "name": "ذرة",
+      "imagePath": "/assets/vegetables/vegetable_corn_01.png"
+    },
+    {
+      "category": "vegetable",
+      "slug": "eggplant",
+      "name": "باذنجان",
+      "imagePath": "/assets/vegetables/vegetable_eggplant_01.png"
+    },
+    {
+      "category": "animal",
+      "slug": "elephant",
+      "name": "فيل",
+      "imagePath": "/assets/animals/animal_elephant_01.png"
+    },
+    {
+      "category": "object",
+      "slug": "tv",
+      "name": "تلفزيون",
+      "imagePath": "/assets/objects/object_tv_01.png"
+    },
+    {
+      "category": "vegetable",
+      "slug": "tomato",
+      "name": "طماطم",
+      "imagePath": "/assets/vegetables/vegetable_tomato_01.png"
+    },
+    {
+      "category": "animal",
+      "slug": "giraffe",
+      "name": "زرافة",
+      "imagePath": "/assets/animals/animal_giraffe_01.png"
+    },
+    {
+      "category": "vegetable",
+      "slug": "lettuce",
+      "name": "خس",
+      "imagePath": "/assets/vegetables/vegetable_lettuce_01.png"
+    },
+    {
+      "category": "food",
+      "slug": "hot_dog",
+      "name": "هوت دوج",
+      "imagePath": "/assets/foods/food_hot_dog_01.png"
+    },
+    {
+      "category": "food",
+      "slug": "ice_cream",
+      "name": "آيس كريم",
+      "imagePath": "/assets/foods/food_ice_cream_01.png"
+    },
+    {
+      "category": "food",
+      "slug": "burger",
+      "name": "برجر",
+      "imagePath": "/assets/foods/food_burger_01.png"
+    },
+    {
+      "category": "object",
+      "slug": "laptop",
+      "name": "لاب توب",
+      "imagePath": "/assets/objects/object_laptop_01.png"
+    },
+    {
+      "category": "object",
+      "slug": "light_bulb",
+      "name": "لمبة",
+      "imagePath": "/assets/objects/object_light_bulb_01.png"
+    },
+    {
+      "category": "animal",
+      "slug": "lion",
+      "name": "أسد",
+      "imagePath": "/assets/animals/animal_lion_01.png"
+    },
+    {
+      "category": "fruit",
+      "slug": "mango",
+      "name": "مانجو",
+      "imagePath": "/assets/fruits/fruit_mango_01.png"
+    },
+    {
+      "category": "object",
+      "slug": "car",
+      "name": "عربية",
+      "imagePath": "/assets/objects/object_car_01.png"
+    },
+    {
+      "category": "animal",
+      "slug": "monkey",
+      "name": "قرد",
+      "imagePath": "/assets/animals/animal_monkey_01.png"
+    },
+    {
+      "category": "object",
+      "slug": "table",
+      "name": "ترابيزة",
+      "imagePath": "/assets/objects/object_table_01.png"
+    },
+    {
+      "category": "vegetable",
+      "slug": "onion",
+      "name": "بصل",
+      "imagePath": "/assets/vegetables/vegetable_onion_01.png"
+    },
+    {
+      "category": "fruit",
+      "slug": "orange",
+      "name": "برتقال",
+      "imagePath": "/assets/fruits/fruit_orange_01.png"
+    },
+    {
+      "category": "animal",
+      "slug": "panda",
+      "name": "باندا",
+      "imagePath": "/assets/animals/animal_panda_01.png"
+    },
+    {
+      "category": "fruit",
+      "slug": "pear",
+      "name": "كمثرى",
+      "imagePath": "/assets/fruits/fruit_pear_01.png"
+    },
+    {
+      "category": "animal",
+      "slug": "penguin",
+      "name": "بطريق",
+      "imagePath": "/assets/animals/animal_penguin_01.png"
+    },
+    {
+      "category": "fruit",
+      "slug": "pineapple",
+      "name": "أناناس",
+      "imagePath": "/assets/fruits/fruit_pineapple_01.png"
+    },
+    {
+      "category": "food",
+      "slug": "pasta",
+      "name": "مكرونة",
+      "imagePath": "/assets/foods/food_pasta_01.png"
+    },
+    {
+      "category": "vegetable",
+      "slug": "potato",
+      "name": "بطاطس",
+      "imagePath": "/assets/vegetables/vegetable_potato_01.png"
+    },
+    {
+      "category": "animal",
+      "slug": "rabbit",
+      "name": "أرنب",
+      "imagePath": "/assets/animals/animal_rabbit_01.png"
+    },
+    {
+      "category": "fruit",
+      "slug": "apple",
+      "name": "تفاحة",
+      "imagePath": "/assets/fruits/fruit_apple_01.png"
+    },
+    {
+      "category": "fruit",
+      "slug": "watermelon",
+      "name": "بطيخ",
+      "imagePath": "/assets/fruits/fruit_watermelon_01.png"
+    },
+    {
+      "category": "fruit",
+      "slug": "strawberry",
+      "name": "فراولة",
+      "imagePath": "/assets/fruits/fruit_strawberry_01.png"
+    },
+    {
+      "category": "food",
+      "slug": "sushi",
+      "name": "سوشي",
+      "imagePath": "/assets/foods/food_sushi_01.png"
+    },
+    {
+      "category": "food",
+      "slug": "taco",
+      "name": "تاكو",
+      "imagePath": "/assets/foods/food_taco_01.png"
+    },
+    {
+      "category": "animal",
+      "slug": "tiger",
+      "name": "نمر",
+      "imagePath": "/assets/animals/animal_tiger_01.png"
+    },
+    {
+      "category": "food",
+      "slug": "pizza",
+      "name": "بيتزا",
+      "imagePath": "/assets/foods/food_pizza_01.png"
+    },
+    {
+      "category": "object",
+      "slug": "chair",
+      "name": "كرسي",
+      "imagePath": "/assets/objects/object_chair_01.png"
+    }
+  ]
+}

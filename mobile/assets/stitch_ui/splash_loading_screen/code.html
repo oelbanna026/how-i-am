@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+
+<html class="dark" dir="rtl" lang="ar"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&amp;family=Cairo:wght@400;700;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "primary-fixed-dim": "#ea9f00",
+                    "tertiary-dim": "#ff5dd9",
+                    "surface-container-highest": "#202632",
+                    "on-tertiary": "#500042",
+                    "on-tertiary-fixed": "#34002a",
+                    "surface-container-low": "#0f131c",
+                    "primary-dim": "#ea9f00",
+                    "primary": "#ffb22b",
+                    "secondary-dim": "#2eee9c",
+                    "on-tertiary-container": "#38002e",
+                    "surface": "#0a0e16",
+                    "on-surface-variant": "#a8abb6",
+                    "secondary-fixed": "#45fda9",
+                    "surface-container": "#151a23",
+                    "on-secondary": "#005c39",
+                    "on-tertiary-fixed-variant": "#6f005c",
+                    "primary-fixed": "#faac1a",
+                    "surface-bright": "#262c39",
+                    "error-dim": "#d53d18",
+                    "on-secondary-fixed": "#00472b",
+                    "on-surface": "#eef0fc",
+                    "tertiary-fixed-dim": "#ff6ad9",
+                    "on-primary-fixed-variant": "#5b3b00",
+                    "surface-container-high": "#1a202a",
+                    "background": "#0a0e16",
+                    "surface-container-lowest": "#000000",
+                    "on-secondary-fixed-variant": "#006740",
+                    "inverse-primary": "#825600",
+                    "on-secondary-container": "#e1ffe9",
+                    "on-primary": "#543600",
+                    "error": "#ff7351",
+                    "secondary-fixed-dim": "#2eee9c",
+                    "tertiary-container": "#fe4ed7",
+                    "primary-container": "#f1a40c",
+                    "secondary": "#45fda9",
+                    "outline": "#727580",
+                    "inverse-on-surface": "#51555f",
+                    "error-container": "#b92902",
+                    "on-background": "#eef0fc",
+                    "on-primary-fixed": "#331f00",
+                    "surface-tint": "#ffb22b",
+                    "outline-variant": "#444851",
+                    "inverse-surface": "#f9f9ff",
+                    "on-error": "#450900",
+                    "surface-variant": "#202632",
+                    "on-error-container": "#ffd2c8",
+                    "tertiary-fixed": "#ff87dc",
+                    "tertiary": "#ff70da",
+                    "on-primary-container": "#472d00",
+                    "surface-dim": "#0a0e16",
+                    "secondary-container": "#006d43"
+            },
+            "borderRadius": {
+                    "DEFAULT": "1rem",
+                    "lg": "2rem",
+                    "xl": "3rem",
+                    "full": "9999px"
+            },
+            "fontFamily": {
+                    "headline": ["Cairo", "Plus Jakarta Sans"],
+                    "body": ["Cairo", "Plus Jakarta Sans"],
+                    "label": ["Plus Jakarta Sans", "Cairo"]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body {
+            background-color: #0a0e16;
+            overflow: hidden;
+        }
+        .neon-glow {
+            text-shadow: 0 0 10px rgba(255, 178, 43, 0.5), 0 0 20px rgba(255, 178, 43, 0.3);
+        }
+        .text-outline {
+            -webkit-text-stroke: 1.5px #ffb22b;
+            color: transparent;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="font-body text-on-background selection:bg-primary selection:text-on-primary">
+<!-- Background Decorative Blobs -->
+<div class="fixed inset-0 overflow-hidden pointer-events-none">
+<div class="absolute -top-24 -left-24 w-96 h-96 bg-primary/10 rounded-full blur-[120px]"></div>
+<div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-tertiary/5 rounded-full blur-[150px]"></div>
+<div class="absolute -bottom-48 -right-24 w-80 h-80 bg-secondary/10 rounded-full blur-[100px]"></div>
+</div>
+<!-- Main Splash Container -->
+<main class="relative z-10 h-screen w-full flex flex-col items-center justify-center px-6">
+<!-- Logo Section -->
+<div class="flex flex-col items-center mb-24">
+<div class="relative">
+<!-- Glowing Aura -->
+<div class="absolute inset-0 bg-primary/20 blur-3xl rounded-full scale-150"></div>
+<!-- Main Branding -->
+<div class="relative flex flex-col items-center space-y-2">
+<h1 class="text-outline text-6xl md:text-8xl font-black italic tracking-widest leading-none drop-shadow-[0_0_15px_rgba(255,178,43,0.4)]">
+                        مين أنا؟
+                    </h1>
+<div class="flex items-center space-x-reverse space-x-4">
+<span class="bg-primary px-3 py-1 rounded-md text-on-primary font-bold text-sm tracking-tighter transform -rotate-3">
+                            Online
+                        </span>
+<span class="text-on-surface-variant font-medium tracking-[0.2em] text-xs uppercase">
+                            Egypt Edition
+                        </span>
+</div>
+</div>
+</div>
+</div>
+<!-- Loading State Area -->
+<div class="flex flex-col items-center justify-center space-y-10 w-full max-w-sm">
+<!-- Loading Indicator -->
+<div class="flex flex-col items-center space-y-4">
+<div class="flex space-x-reverse space-x-3">
+<div class="w-3 h-3 bg-primary rounded-full shadow-[0_0_10px_#ffb22b]"></div>
+<div class="w-3 h-3 bg-primary/40 rounded-full"></div>
+<div class="w-3 h-3 bg-primary/20 rounded-full"></div>
+</div>
+<p class="text-on-surface font-bold text-xl tracking-tight">
+                    بنولّع الجيم… 🔥
+                </p>
+</div>
+<!-- Tip Card (Editorial Style) -->
+<div class="w-full bg-surface-container-highest/40 backdrop-blur-2xl border border-outline-variant/10 rounded-xl p-6 relative overflow-hidden group">
+<!-- Asymmetric accent -->
+<div class="absolute top-0 right-0 w-16 h-1 bg-gradient-to-l from-primary to-transparent"></div>
+<div class="flex items-start space-x-reverse space-x-4">
+<div class="bg-secondary-container/30 p-2 rounded-lg">
+<span class="material-symbols-outlined text-secondary" data-icon="tips_and_updates">tips_and_updates</span>
+</div>
+<div class="flex flex-col space-y-1">
+<span class="text-secondary font-bold text-[10px] uppercase tracking-widest opacity-80">PRO TIP</span>
+<p class="text-on-surface leading-relaxed font-medium">
+                            أسرع واحد بيخمن بياخد بونص!
+                        </p>
+</div>
+</div>
+<!-- Decorative element -->
+<div class="absolute -bottom-4 -left-4 opacity-5 pointer-events-none">
+<span class="material-symbols-outlined text-8xl" data-icon="rocket_launch">rocket_launch</span>
+</div>
+</div>
+</div>
+<!-- Footer Meta -->
+<div class="absolute bottom-12 flex flex-col items-center space-y-2 opacity-40">
+<p class="text-[10px] tracking-[0.3em] font-bold uppercase text-on-surface-variant">Cairo Street Vibes</p>
+<div class="h-0.5 w-8 bg-outline-variant rounded-full"></div>
+</div>
+</main>
+<!-- Suppressed Shell Components for Transactional/Loading State -->
+<!-- Navigation is hidden to prioritize the loading canvas as per the "The Destination Rule" -->
+</body></html>

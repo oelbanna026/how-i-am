@@ -1,0 +1,189 @@
+<html class="dark"><head>
+<meta charset="utf-8"/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@200;400;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "primary-fixed-dim": "#ea9f00",
+                    "tertiary-dim": "#ff5dd9",
+                    "surface-container-highest": "#202632",
+                    "on-tertiary": "#500042",
+                    "on-tertiary-fixed": "#34002a",
+                    "surface-container-low": "#0f131c",
+                    "primary-dim": "#ea9f00",
+                    "primary": "#ffb22b",
+                    "secondary-dim": "#2eee9c",
+                    "on-tertiary-container": "#38002e",
+                    "surface": "#0a0e16",
+                    "on-surface-variant": "#a8abb6",
+                    "secondary-fixed": "#45fda9",
+                    "surface-container": "#151a23",
+                    "on-secondary": "#005c39",
+                    "on-tertiary-fixed-variant": "#6f005c",
+                    "primary-fixed": "#faac1a",
+                    "surface-bright": "#262c39",
+                    "error-dim": "#d53d18",
+                    "on-secondary-fixed": "#00472b",
+                    "on-surface": "#eef0fc",
+                    "tertiary-fixed-dim": "#ff6ad9",
+                    "on-primary-fixed-variant": "#5b3b00",
+                    "surface-container-high": "#1a202a",
+                    "background": "#0a0e16",
+                    "surface-container-lowest": "#000000",
+                    "on-secondary-fixed-variant": "#006740",
+                    "inverse-primary": "#825600",
+                    "on-secondary-container": "#e1ffe9",
+                    "on-primary": "#543600",
+                    "error": "#ff7351",
+                    "secondary-fixed-dim": "#2eee9c",
+                    "tertiary-container": "#fe4ed7",
+                    "primary-container": "#f1a40c",
+                    "secondary": "#45fda9",
+                    "outline": "#727580",
+                    "inverse-on-surface": "#51555f",
+                    "error-container": "#b92902",
+                    "on-background": "#eef0fc",
+                    "on-primary-fixed": "#331f00",
+                    "surface-tint": "#ffb22b",
+                    "outline-variant": "#444851",
+                    "inverse-surface": "#f9f9ff",
+                    "on-error": "#450900",
+                    "surface-variant": "#202632",
+                    "on-error-container": "#ffd2c8",
+                    "tertiary-fixed": "#ff87dc",
+                    "tertiary": "#ff70da",
+                    "on-primary-container": "#472d00",
+                    "surface-dim": "#0a0e16",
+                    "secondary-container": "#006d43"
+            },
+            "borderRadius": {
+                    "DEFAULT": "1rem",
+                    "lg": "2rem",
+                    "xl": "3rem",
+                    "full": "9999px"
+            },
+            "fontFamily": {
+                    "headline": ["Plus Jakarta Sans"],
+                    "body": ["Plus Jakarta Sans"],
+                    "label": ["Plus Jakarta Sans"]
+            }
+          }
+        }
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-surface selection:bg-primary selection:text-on-primary overflow-x-hidden">
+<!-- TopAppBar -->
+<header class="fixed top-0 left-0 w-full z-50 flex items-center justify-between px-6 h-16 bg-[#0a0e16]/80 backdrop-blur-xl shadow-[0_0_40px_-15px_rgba(255,176,32,0.15)]">
+<div class="flex items-center gap-3">
+<button class="w-10 h-10 flex items-center justify-center rounded-full text-white/60 hover:bg-white/10 transition-all active:scale-95">
+<span class="material-symbols-outlined">group</span>
+</button>
+<h1 class="font-['Plus_Jakarta_Sans'] font-bold tracking-tight text-xl text-white">لمة الجمعة</h1>
+</div>
+<div class="flex items-center gap-3">
+<div class="bg-surface-container-highest px-3 py-1.5 rounded-full border border-outline-variant/20 flex items-center gap-2">
+<span class="text-[10px] font-bold text-primary-dim uppercase tracking-tighter">Code</span>
+<span class="text-sm font-black text-on-surface tracking-widest uppercase">KX72-JP</span>
+</div>
+<button class="w-10 h-10 flex items-center justify-center rounded-full text-[#FFB020] hover:bg-white/10 transition-all active:scale-95">
+<span class="material-symbols-outlined">share</span>
+</button>
+</div>
+</header>
+<main class="pt-24 pb-40 px-6 max-w-md mx-auto min-h-screen relative">
+<!-- Lobby State -->
+<div class="mb-8 text-center">
+<span class="inline-block px-4 py-1 rounded-full bg-secondary-container/20 text-secondary-dim text-xs font-bold uppercase tracking-widest mb-2">Waiting for players</span>
+<p class="text-on-surface-variant text-sm">Need 2 more players to start</p>
+</div>
+<!-- Player List (Bento-ish Grid) -->
+<div class="grid grid-cols-2 gap-4">
+<!-- Host -->
+<div class="relative bg-surface-container-high p-5 rounded-xl border border-primary/10 flex flex-col items-center justify-center text-center">
+<div class="relative mb-3">
+<img class="w-20 h-20 rounded-full border-4 border-primary" data-alt="Close-up 3D stylized avatar of a young Egyptian man with trendy glasses and cool lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDa2bRNBc-XjCiN4d5f5qiFyQwaArFg_xhIDJzSYwjHn881TRLb6OkeP1ofF1508E2tkjgNCuVZj4eHlsrbbQC-DrXMVRUFABACG_R7jY0XEEMNchHbsRC5_sz3yfc57nAtAffpYjt4IvnNQSJ3nD22rdwvC1WIIy7JKZ1qpV4sz24nDEHjO6ze45gZ8n154PXOwLMRE7WBjtqwgcy2LjgvGFbqCrSxov69DqCyXGuQiaP77-95sSISN-un7-7uqWZQhdXwUhGsmg"/>
+<div class="absolute -bottom-1 -right-1 bg-primary text-on-primary-container p-1 rounded-full border-2 border-surface-container-high">
+<span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1;">star</span>
+</div>
+</div>
+<h3 class="font-bold text-on-surface">ياسين (Host)</h3>
+<span class="text-[10px] text-primary-dim font-black uppercase mt-1">Managing</span>
+</div>
+<!-- Ready Player -->
+<div class="relative bg-surface-container-low p-5 rounded-xl border border-outline-variant/10 flex flex-col items-center justify-center text-center">
+<div class="relative mb-3">
+<img class="w-20 h-20 rounded-full border-2 border-secondary" data-alt="Close-up 3D stylized avatar of a young Egyptian woman with colorful hijab and friendly smile" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBrv6p5K7F5xZMqizC0lincMV-5EeG-JyOloVfeza9d8ZjY7-uQVHo3q2NnWF_D_eTH2gMqip8MJAZIXIB8V8FVekavIVF73m-4uxLVUejhTrtb4A9mcMVeqAe01jIlwOgCZ-_SG0T62r_OVoauVuE8QHXV6rVq4HEgBYyh7BDf4bwZvlQrn-vo3TVR_SkH5IWjb16NNlOxKvMUSpIkqKGI0FCDcJgf7rtgK_lkkVeFKvFbnVr5sSPJzhqKQqdqaUkHs8oTnQxWHg"/>
+<div class="absolute -bottom-1 -right-1 bg-secondary text-on-secondary p-1 rounded-full">
+<span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1;">check</span>
+</div>
+</div>
+<h3 class="font-bold text-on-surface">سارة</h3>
+<span class="text-[10px] text-secondary-dim font-black uppercase mt-1">جاهز</span>
+</div>
+<!-- Ready Player -->
+<div class="relative bg-surface-container-low p-5 rounded-xl border border-outline-variant/10 flex flex-col items-center justify-center text-center">
+<div class="relative mb-3">
+<img class="w-20 h-20 rounded-full border-2 border-secondary" data-alt="Close-up 3D stylized avatar of a man with a goatee and modern hairstyle" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBglG059sivKhu3gTzs0krUnckYy1XKNGgoUuie3t87blq6YpSxu9gzhRCMOIP0-RQ1Z1HZaRJpB4SnU2ZfJbERfYNXzLThxmEy-cKwD8tp_lFadhmTOH77KIwV-oUOqRlaGj2rARuLuT8EmzESann73izivb7A6qrtvHA33uohasvGlI8_y-FDHQoIPfTRHBU7uJtqNtnjLT8fABBz4SGIAsr7zADZLwlENn9YlZ-uSZTk5DfynQxCVe1_WaEzJEGFavM3vB27NA"/>
+<div class="absolute -bottom-1 -right-1 bg-secondary text-on-secondary p-1 rounded-full">
+<span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1;">check</span>
+</div>
+</div>
+<h3 class="font-bold text-on-surface">عمر</h3>
+<span class="text-[10px] text-secondary-dim font-black uppercase mt-1">جاهز</span>
+</div>
+<!-- Empty Slot -->
+<button class="relative bg-surface-container-lowest/50 border-2 border-dashed border-outline-variant/20 p-5 rounded-xl flex flex-col items-center justify-center text-center group active:scale-95 transition-all">
+<div class="w-20 h-20 rounded-full bg-surface-container-highest flex items-center justify-center mb-3 group-hover:bg-primary/10 transition-colors">
+<span class="material-symbols-outlined text-outline text-3xl">person_add</span>
+</div>
+<h3 class="font-bold text-outline group-hover:text-primary transition-colors">اعزم حد</h3>
+</button>
+</div>
+<!-- Quick Reactions -->
+<div class="mt-10 mb-6">
+<p class="text-on-surface-variant text-[10px] uppercase font-bold tracking-[0.2em] mb-4 text-center">Quick Reactions</p>
+<div class="flex justify-center gap-4 bg-white/5 backdrop-blur-md p-3 rounded-full border border-white/10">
+<button class="text-2xl hover:scale-125 transition-transform active:scale-90">😂</button>
+<button class="text-2xl hover:scale-125 transition-transform active:scale-90">🔥</button>
+<button class="text-2xl hover:scale-125 transition-transform active:scale-90">👏</button>
+<button class="text-2xl hover:scale-125 transition-transform active:scale-90">🤯</button>
+<button class="text-2xl hover:scale-125 transition-transform active:scale-90">👾</button>
+</div>
+</div>
+<!-- Rules Link -->
+<div class="flex justify-center mb-10">
+<button class="flex items-center gap-2 px-6 py-3 bg-surface-container-highest/80 backdrop-blur-xl rounded-full border border-outline-variant/20 hover:bg-surface-bright transition-all active:scale-95">
+<span class="material-symbols-outlined text-tertiary">bolt</span>
+<span class="text-sm font-semibold">القواعد في 20 ثانية</span>
+</button>
+</div>
+</main>
+<!-- Bottom Actions Area (Non-Shell but Anchored) -->
+<div class="fixed bottom-0 left-0 w-full px-6 pb-10 pt-6 bg-gradient-to-t from-background via-background/90 to-transparent flex flex-col items-center gap-4 z-40">
+<button class="w-full max-w-md py-5 rounded-xl bg-secondary-container/20 text-secondary-dim/40 font-black text-xl border border-secondary-container/30 flex items-center justify-center gap-3 cursor-not-allowed" disabled="">
+<span>ابدأ</span>
+<span class="material-symbols-outlined">play_arrow</span>
+</button>
+<p class="text-xs text-on-surface-variant font-medium">Host will start once everyone is ready</p>
+</div>
+<!-- BottomNavBar (Suppressed as per rule: Focused/Lobby intent is task-focused) -->
+<!-- The prompt implies a focused waiting room state where main nav is irrelevant. -->
+</body></html>

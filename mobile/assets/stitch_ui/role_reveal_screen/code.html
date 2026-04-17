@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+
+<html class="dark" dir="rtl" lang="ar"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta_Sans:wght@400;500;600;700;800&amp;family=Cairo:wght@400;600;700;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "primary-fixed-dim": "#ea9f00",
+                        "tertiary-dim": "#ff5dd9",
+                        "surface-container-highest": "#202632",
+                        "on-tertiary": "#500042",
+                        "on-tertiary-fixed": "#34002a",
+                        "surface-container-low": "#0f131c",
+                        "primary-dim": "#ea9f00",
+                        "primary": "#ffb22b",
+                        "secondary-dim": "#2eee9c",
+                        "on-tertiary-container": "#38002e",
+                        "surface": "#0a0e16",
+                        "on-surface-variant": "#a8abb6",
+                        "secondary-fixed": "#45fda9",
+                        "surface-container": "#151a23",
+                        "on-secondary": "#005c39",
+                        "on-tertiary-fixed-variant": "#6f005c",
+                        "primary-fixed": "#faac1a",
+                        "surface-bright": "#262c39",
+                        "error-dim": "#d53d18",
+                        "on-secondary-fixed": "#00472b",
+                        "on-surface": "#eef0fc",
+                        "tertiary-fixed-dim": "#ff6ad9",
+                        "on-primary-fixed-variant": "#5b3b00",
+                        "surface-container-high": "#1a202a",
+                        "background": "#0a0e16",
+                        "surface-container-lowest": "#000000",
+                        "on-secondary-fixed-variant": "#006740",
+                        "inverse-primary": "#825600",
+                        "on-secondary-container": "#e1ffe9",
+                        "on-primary": "#543600",
+                        "error": "#ff7351",
+                        "secondary-fixed-dim": "#2eee9c",
+                        "tertiary-container": "#fe4ed7",
+                        "primary-container": "#f1a40c",
+                        "secondary": "#45fda9",
+                        "outline": "#727580",
+                        "inverse-on-surface": "#51555f",
+                        "error-container": "#b92902",
+                        "on-background": "#eef0fc",
+                        "on-primary-fixed": "#331f00",
+                        "surface-tint": "#ffb22b",
+                        "outline-variant": "#444851",
+                        "inverse-surface": "#f9f9ff",
+                        "on-error": "#450900",
+                        "surface-variant": "#202632",
+                        "on-error-container": "#ffd2c8",
+                        "tertiary-fixed": "#ff87dc",
+                        "tertiary": "#ff70da",
+                        "on-primary-container": "#472d00",
+                        "surface-dim": "#0a0e16",
+                        "secondary-container": "#006d43"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "1rem",
+                        "lg": "2rem",
+                        "xl": "3rem",
+                        "full": "9999px"
+                    },
+                    "fontFamily": {
+                        "headline": ["Plus Jakarta Sans", "Cairo"],
+                        "body": ["Plus Jakarta Sans", "Cairo"],
+                        "label": ["Plus Jakarta Sans", "Cairo"]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body {
+            background-color: #0a0e16;
+            font-family: 'Cairo', 'Plus Jakarta Sans', sans-serif;
+            overflow: hidden;
+        }
+        .neon-glow-primary {
+            text-shadow: 0 0 20px rgba(255, 178, 43, 0.6), 0 0 40px rgba(255, 178, 43, 0.3);
+        }
+        .neon-glow-tertiary {
+            text-shadow: 0 0 20px rgba(255, 112, 218, 0.6), 0 0 40px rgba(255, 112, 218, 0.3);
+        }
+        /* Asymmetric Design Elements */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="text-on-surface">
+<!-- Top AppBar (from JSON) -->
+<header class="fixed top-0 left-0 w-full z-50 flex items-center justify-between px-6 h-16 bg-[#0a0e16]/80 backdrop-blur-xl shadow-[0_0_40px_-15px_rgba(255,176,32,0.15)]">
+<div class="flex items-center gap-4">
+<button class="hover:bg-white/10 transition-all p-2 rounded-full active:scale-95 active:duration-100">
+<span class="material-symbols-outlined text-[#FFB020]">group</span>
+</button>
+<h1 class="font-['Plus_Jakarta_Sans'] font-bold tracking-tight text-xl text-[#FFB020]">مين أنا؟</h1>
+</div>
+<button class="hover:bg-white/10 transition-all p-2 rounded-full active:scale-95 active:duration-100">
+<span class="material-symbols-outlined text-[#FFB020]">share</span>
+</button>
+</header>
+<!-- Main Content Canvas -->
+<main class="relative h-screen w-full flex items-center justify-center p-6 overflow-hidden">
+<!-- Background Accents (Visual Soul) -->
+<div class="absolute -top-[10%] -left-[10%] w-[60%] h-[60%] bg-primary/10 blur-[120px] rounded-full"></div>
+<div class="absolute -bottom-[10%] -right-[10%] w-[60%] h-[60%] bg-tertiary/10 blur-[120px] rounded-full"></div>
+<!-- Role Reveal Container (Asymmetric Placement) -->
+<div class="relative z-10 w-full max-w-md h-[618px] flex flex-col items-center justify-center gap-8">
+<!-- Warning Label (Editorial Style) -->
+<div class="flex flex-col items-center gap-2 -rotate-1">
+<span class="text-tertiary font-black text-xs uppercase tracking-[0.3em] mb-1">Top Secret</span>
+<h2 class="text-on-surface font-black text-4xl md:text-5xl tracking-tighter leading-tight text-center">
+                    ما تبصّش لحد <span class="inline-block animate-bounce">👀</span>
+</h2>
+</div>
+<!-- Reveal Card (Glassmorphism & High-Drama Lighting) -->
+<div class="glass-card relative w-full aspect-[3/4] rounded-xl flex flex-col items-center justify-center p-8 overflow-hidden group shadow-[0_30px_60px_-12px_rgba(0,0,0,0.5)]">
+<!-- Inner Neon Border Effect -->
+<div class="absolute inset-0 border-[2px] border-primary/20 rounded-xl m-3"></div>
+<!-- Abstract Role Graphic -->
+<div class="relative mb-12 transform rotate-3">
+<div class="absolute inset-0 bg-primary/20 blur-3xl rounded-full scale-150"></div>
+<div class="relative bg-surface-container-highest rounded-full w-40 h-40 flex items-center justify-center border-4 border-primary">
+<img alt="Role Avatar" class="w-32 h-32 object-cover rounded-full" data-alt="Avatar placeholder" src="https://api.dicebear.com/9.x/thumbs/png?seed=role"/>
+</div>
+</div>
+<!-- Reveal Text Content -->
+<div class="text-center z-10 space-y-4">
+<p class="text-on-surface-variant font-medium tracking-widest text-sm uppercase">الدور بتاعك</p>
+<div class="space-y-1">
+<span class="text-on-surface text-2xl font-bold opacity-60">انت:</span>
+<h3 class="neon-glow-primary text-primary font-black text-5xl md:text-6xl tracking-tight leading-none drop-shadow-2xl">
+                            —<br/>—
+                        </h3>
+</div>
+</div>
+<!-- Editorial Viral Chips -->
+<div class="absolute top-6 left-6 -rotate-12 bg-secondary-container text-on-secondary-container text-[10px] font-bold px-3 py-1 rounded-full shadow-lg">
+                    #خطر_جداً
+                </div>
+<div class="absolute bottom-10 right-6 rotate-12 bg-surface-container-highest text-tertiary text-[10px] font-bold px-3 py-1 rounded-full shadow-lg border border-tertiary/20">
+                    محدش يعرف
+                </div>
+</div>
+<!-- Main Action CTA -->
+<div class="w-full mt-4 flex flex-col items-center">
+<button class="group relative w-full h-16 bg-gradient-to-tr from-primary to-primary-container rounded-lg flex items-center justify-center overflow-hidden shadow-[0_10px_30px_-5px_rgba(255,178,43,0.4)] active:scale-95 transition-transform duration-300">
+<div class="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+<span class="relative text-on-primary font-black text-xl tracking-tight">أنا جاهز</span>
+<span class="material-symbols-outlined ms-3 text-on-primary" data-weight="fill">rocket_launch</span>
+</button>
+<p class="text-on-surface-variant text-[10px] font-bold mt-4 uppercase tracking-[0.2em] opacity-40">داس عليه لما تكون لوحدك</p>
+</div>
+</div>
+</main>
+<!-- BottomNavBar Suppressed based on Transactional/Task-Focused context for this specific reveal moment -->
+<!-- Floating Asymmetric Accent Element -->
+<div class="fixed top-1/2 -right-20 w-40 h-40 bg-tertiary/20 rounded-full blur-[80px] pointer-events-none"></div>
+<div class="fixed top-1/4 -left-10 w-20 h-20 border border-primary/20 rounded-xl rotate-45 pointer-events-none"></div>
+</body></html>

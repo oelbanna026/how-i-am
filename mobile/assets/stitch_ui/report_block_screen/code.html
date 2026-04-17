@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+
+<html class="dark" dir="rtl" lang="ar"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&amp;family=Cairo:wght@200..900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "primary-fixed-dim": "#ea9f00",
+                        "tertiary-dim": "#ff5dd9",
+                        "surface-container-highest": "#202632",
+                        "on-tertiary": "#500042",
+                        "on-tertiary-fixed": "#34002a",
+                        "surface-container-low": "#0f131c",
+                        "primary-dim": "#ea9f00",
+                        "primary": "#ffb22b",
+                        "secondary-dim": "#2eee9c",
+                        "on-tertiary-container": "#38002e",
+                        "surface": "#0a0e16",
+                        "on-surface-variant": "#a8abb6",
+                        "secondary-fixed": "#45fda9",
+                        "surface-container": "#151a23",
+                        "on-secondary": "#005c39",
+                        "on-tertiary-fixed-variant": "#6f005c",
+                        "primary-fixed": "#faac1a",
+                        "surface-bright": "#262c39",
+                        "error-dim": "#d53d18",
+                        "on-secondary-fixed": "#00472b",
+                        "on-surface": "#eef0fc",
+                        "tertiary-fixed-dim": "#ff6ad9",
+                        "on-primary-fixed-variant": "#5b3b00",
+                        "surface-container-high": "#1a202a",
+                        "background": "#0a0e16",
+                        "surface-container-lowest": "#000000",
+                        "on-secondary-fixed-variant": "#006740",
+                        "inverse-primary": "#825600",
+                        "on-secondary-container": "#e1ffe9",
+                        "on-primary": "#543600",
+                        "error": "#ff7351",
+                        "secondary-fixed-dim": "#2eee9c",
+                        "tertiary-container": "#fe4ed7",
+                        "primary-container": "#f1a40c",
+                        "secondary": "#45fda9",
+                        "outline": "#727580",
+                        "inverse-on-surface": "#51555f",
+                        "error-container": "#b92902",
+                        "on-background": "#eef0fc",
+                        "on-primary-fixed": "#331f00",
+                        "surface-tint": "#ffb22b",
+                        "outline-variant": "#444851",
+                        "inverse-surface": "#f9f9ff",
+                        "on-error": "#450900",
+                        "surface-variant": "#202632",
+                        "on-error-container": "#ffd2c8",
+                        "tertiary-fixed": "#ff87dc",
+                        "tertiary": "#ff70da",
+                        "on-primary-container": "#472d00",
+                        "surface-dim": "#0a0e16",
+                        "secondary-container": "#006d43"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "1rem",
+                        "lg": "2rem",
+                        "xl": "3rem",
+                        "full": "9999px"
+                    },
+                    "fontFamily": {
+                        "headline": ["Plus Jakarta Sans", "Cairo"],
+                        "body": ["Plus Jakarta Sans", "Cairo"],
+                        "label": ["Plus Jakarta Sans", "Cairo"]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body { font-family: 'Plus Jakarta Sans', 'Cairo', sans-serif; }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .neon-glow-primary {
+            box-shadow: 0 0 20px rgba(255, 178, 43, 0.15);
+        }
+        .neon-glow-error {
+            box-shadow: 0 0 20px rgba(255, 115, 81, 0.2);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-surface min-h-screen flex flex-col overflow-hidden">
+<!-- Top App Bar (As defined in JSON) -->
+<header class="fixed top-0 left-0 w-full z-50 flex items-center justify-between px-6 h-16 bg-[#0a0e16]/80 backdrop-blur-xl shadow-[0_0_40px_-15px_rgba(255,176,32,0.15)]">
+<div class="flex items-center gap-4">
+<button class="material-symbols-outlined text-[#FFB020] hover:bg-white/10 transition-all p-2 rounded-full scale-95 active:duration-100" data-icon="group">group</button>
+<h1 class="font-['Plus_Jakarta_Sans'] font-bold tracking-tight text-xl text-[#FFB020]">مين أنا؟</h1>
+</div>
+<div class="flex items-center gap-2">
+<button class="material-symbols-outlined text-[#FFB020] hover:bg-white/10 transition-all p-2 rounded-full scale-95 active:duration-100" data-icon="share">share</button>
+</div>
+</header>
+<!-- Main Content Background (Simulated User Profile/Content) -->
+<main class="flex-1 pt-20 pb-32 px-6">
+<div class="relative w-full aspect-square rounded-xl overflow-hidden mb-8 border border-outline-variant/15">
+<img class="w-full h-full object-cover" data-alt="dramatic cinematic portrait of a young egyptian gamer in a neon lit room with blue and orange ambient lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCaEnmSMrmRNNKrJCFYAsSlrVb4wBFeqpdSYQqqJT3Px99jfgZa6D9-rJwj8AiE2nF8bJqpFS3yOv0N5MB81i-6JnQLj2vuJz_VRlVkLyTDaT0Vx-WMQlLw2kr9ezaBsTI19wvOgMsI1Yca6npVPcoPlbenik4juZ01ZOZmAVnPs_EHPXs4KzVpABYGE6XNmvXn-vxbyBuw3F-cciZ0pGYbvWG0PVIo7pEecWQsuuBFnVQZ_miSW_pvGAVGLyKmpgga5vZ8G64wuQ"/>
+<div class="absolute bottom-0 left-0 w-full p-6 bg-gradient-to-t from-black/80 to-transparent">
+<h2 class="text-3xl font-bold text-on-surface">أحمد م.</h2>
+<p class="text-on-surface-variant">محترف في Call of Duty • القاهرة</p>
+</div>
+</div>
+<div class="grid grid-cols-2 gap-4">
+<div class="bg-surface-container-high p-4 rounded-lg border border-outline-variant/15">
+<span class="text-xs uppercase tracking-widest text-primary-dim font-bold">المستوى</span>
+<p class="text-xl font-black">Level 42</p>
+</div>
+<div class="bg-surface-container-high p-4 rounded-lg border border-outline-variant/15">
+<span class="text-xs uppercase tracking-widest text-secondary-dim font-bold">الانتصارات</span>
+<p class="text-xl font-black">128</p>
+</div>
+</div>
+</main>
+<!-- SUCCESS TOAST (Success Toast Example) -->
+<div class="fixed top-20 left-1/2 -translate-x-1/2 z-[100] w-[90%] max-w-md pointer-events-none">
+<div class="glass-panel border border-secondary/30 rounded-lg p-4 flex items-center gap-4 shadow-[0_10px_30px_rgba(46,238,156,0.15)]">
+<div class="bg-secondary/20 p-2 rounded-full">
+<span class="material-symbols-outlined text-secondary" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+</div>
+<p class="text-on-surface font-bold">تم الإبلاغ بنجاح</p>
+</div>
+</div>
+<!-- BOTTOM SHEET OVERLAY (Scimmed background) -->
+<div class="fixed inset-0 bg-surface-container-lowest/60 backdrop-blur-sm z-[60]"></div>
+<!-- REPORT / BLOCK BOTTOM SHEET -->
+<div class="fixed bottom-0 left-0 w-full z-[70] transition-transform duration-500 transform translate-y-0">
+<div class="glass-panel border-t border-outline-variant/20 rounded-t-xl shadow-[0_-20px_60px_rgba(0,0,0,0.8)] pb-12 pt-4 px-6 max-h-[751px] overflow-y-auto">
+<!-- Drag Handle -->
+<div class="w-12 h-1.5 bg-on-surface-variant/30 rounded-full mx-auto mb-8"></div>
+<div class="flex items-center justify-between mb-8">
+<div>
+<h3 class="text-2xl font-black tracking-tight text-on-surface">إبلاغ عن المستخدم</h3>
+<p class="text-on-surface-variant text-sm mt-1 italic">لماذا ترغب في الإبلاغ عن هذا الحساب؟</p>
+</div>
+<div class="p-3 bg-error-container/20 rounded-full">
+<span class="material-symbols-outlined text-error" style="font-variation-settings: 'FILL' 1;">report</span>
+</div>
+</div>
+<!-- Reasons List (Asymmetric Grid/List) -->
+<div class="space-y-3 mb-10">
+<button class="w-full flex items-center justify-between p-5 rounded-lg bg-surface-container-highest border border-outline-variant/10 hover:border-primary/40 transition-all group">
+<span class="font-bold text-on-surface">رسائل مزعجة (Spam)</span>
+<span class="material-symbols-outlined text-on-surface-variant group-hover:text-primary transition-colors">radio_button_unchecked</span>
+</button>
+<button class="w-full flex items-center justify-between p-5 rounded-lg bg-surface-container-highest border border-primary/60 neon-glow-primary transition-all group">
+<span class="font-bold text-on-surface">محتوى غير لائق</span>
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">radio_button_checked</span>
+</button>
+<button class="w-full flex items-center justify-between p-5 rounded-lg bg-surface-container-highest border border-outline-variant/10 hover:border-primary/40 transition-all group">
+<span class="font-bold text-on-surface">سلوك عدواني أو تنمر</span>
+<span class="material-symbols-outlined text-on-surface-variant group-hover:text-primary transition-colors">radio_button_unchecked</span>
+</button>
+<button class="w-full flex items-center justify-between p-5 rounded-lg bg-surface-container-highest border border-outline-variant/10 hover:border-primary/40 transition-all group">
+<span class="font-bold text-on-surface">انتحال شخصية</span>
+<span class="material-symbols-outlined text-on-surface-variant group-hover:text-primary transition-colors">radio_button_unchecked</span>
+</button>
+<button class="w-full flex items-center justify-between p-5 rounded-lg bg-surface-container-highest border border-outline-variant/10 hover:border-primary/40 transition-all group">
+<span class="font-bold text-on-surface">أسباب أخرى</span>
+<span class="material-symbols-outlined text-on-surface-variant group-hover:text-primary transition-colors">radio_button_unchecked</span>
+</button>
+</div>
+<!-- Action Buttons -->
+<div class="flex flex-col gap-4">
+<button class="w-full py-5 bg-gradient-to-r from-error to-error-container text-on-error font-black rounded-lg text-lg neon-glow-error active:scale-95 transition-all">
+                    تأكيد الإبلاغ والحظر
+                </button>
+<button class="w-full py-5 bg-transparent text-on-surface-variant font-bold rounded-lg border border-outline-variant/20 hover:bg-white/5 active:scale-95 transition-all">
+                    إلغاء
+                </button>
+</div>
+</div>
+</div>
+<!-- Bottom Nav Bar (As defined in JSON) -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-8 pb-6 pt-2 bg-white/10 backdrop-blur-2xl shadow-[0_-10px_40px_rgba(0,0,0,0.5)] rounded-t-[3rem]">
+<a class="flex flex-col items-center justify-center text-white/40 p-3 hover:text-white transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="home">home</span>
+</a>
+<a class="flex flex-col items-center justify-center text-white/40 p-3 hover:text-white transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="sports_esports">sports_esports</span>
+</a>
+<a class="flex flex-col items-center justify-center text-white/40 p-3 hover:text-white transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="leaderboard">leaderboard</span>
+</a>
+<a class="flex flex-col items-center justify-center bg-gradient-to-tr from-[#FFB020] to-[#f1a40c] text-[#0a0e16] rounded-full p-3 shadow-[0_0_20px_rgba(255,176,32,0.4)] Active: scale-110 duration-300 ease-out" href="#">
+<span class="material-symbols-outlined" data-icon="person" style="font-variation-settings: 'FILL' 1;">person</span>
+</a>
+</nav>
+</body></html>

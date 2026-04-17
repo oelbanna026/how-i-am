@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+
+<html class="dark" dir="rtl" lang="ar"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@200;400;600;700;800&amp;family=Cairo:wght@400;700;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "primary-fixed-dim": "#ea9f00",
+                    "tertiary-dim": "#ff5dd9",
+                    "surface-container-highest": "#202632",
+                    "on-tertiary": "#500042",
+                    "on-tertiary-fixed": "#34002a",
+                    "surface-container-low": "#0f131c",
+                    "primary-dim": "#ea9f00",
+                    "primary": "#ffb22b",
+                    "secondary-dim": "#2eee9c",
+                    "on-tertiary-container": "#38002e",
+                    "surface": "#0a0e16",
+                    "on-surface-variant": "#a8abb6",
+                    "secondary-fixed": "#45fda9",
+                    "surface-container": "#151a23",
+                    "on-secondary": "#005c39",
+                    "on-tertiary-fixed-variant": "#6f005c",
+                    "primary-fixed": "#faac1a",
+                    "surface-bright": "#262c39",
+                    "error-dim": "#d53d18",
+                    "on-secondary-fixed": "#00472b",
+                    "on-surface": "#eef0fc",
+                    "tertiary-fixed-dim": "#ff6ad9",
+                    "on-primary-fixed-variant": "#5b3b00",
+                    "surface-container-high": "#1a202a",
+                    "background": "#0a0e16",
+                    "surface-container-lowest": "#000000",
+                    "on-secondary-fixed-variant": "#006740",
+                    "inverse-primary": "#825600",
+                    "on-secondary-container": "#e1ffe9",
+                    "on-primary": "#543600",
+                    "error": "#ff7351",
+                    "secondary-fixed-dim": "#2eee9c",
+                    "tertiary-container": "#fe4ed7",
+                    "primary-container": "#f1a40c",
+                    "secondary": "#45fda9",
+                    "outline": "#727580",
+                    "inverse-on-surface": "#51555f",
+                    "error-container": "#b92902",
+                    "on-background": "#eef0fc",
+                    "on-primary-fixed": "#331f00",
+                    "surface-tint": "#ffb22b",
+                    "outline-variant": "#444851",
+                    "inverse-surface": "#f9f9ff",
+                    "on-error": "#450900",
+                    "surface-variant": "#202632",
+                    "on-error-container": "#ffd2c8",
+                    "tertiary-fixed": "#ff87dc",
+                    "tertiary": "#ff70da",
+                    "on-primary-container": "#472d00",
+                    "surface-dim": "#0a0e16",
+                    "secondary-container": "#006d43"
+            },
+            "borderRadius": {
+                    "DEFAULT": "1rem",
+                    "lg": "2rem",
+                    "xl": "3rem",
+                    "full": "9999px"
+            },
+            "fontFamily": {
+                    "headline": ["Plus Jakarta Sans", "Cairo"],
+                    "body": ["Plus Jakarta Sans", "Cairo"],
+                    "label": ["Plus Jakarta Sans", "Cairo"]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body { font-family: 'Cairo', sans-serif; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .neon-glow-primary {
+            box-shadow: 0 0 20px rgba(255, 178, 43, 0.3);
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(20px);
+        }
+        .editorial-grid {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-surface min-h-screen pb-32 overflow-x-hidden">
+<!-- TopAppBar -->
+<nav class="fixed top-0 left-0 w-full z-50 flex items-center justify-between px-6 h-16 bg-[#0a0e16]/80 backdrop-blur-xl shadow-[0_0_40px_-15px_rgba(255,176,32,0.15)]">
+<div class="flex items-center gap-3">
+<button class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-white/10 transition-all text-[#FFB020] active:scale-95 active:duration-100">
+<span class="material-symbols-outlined" data-icon="group">group</span>
+</button>
+</div>
+<h1 class="font-['Plus_Jakarta_Sans'] font-bold tracking-tight text-xl text-[#FFB020]">مين أنا؟</h1>
+<div class="flex items-center gap-3">
+<button class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-white/10 transition-all text-white/60 active:scale-95 active:duration-100">
+<span class="material-symbols-outlined" data-icon="share">share</span>
+</button>
+</div>
+</nav>
+<main class="pt-24 px-4 max-w-lg mx-auto">
+<!-- Viral Moment Header -->
+<header class="mb-8 relative">
+<div class="absolute -top-10 -right-10 w-40 h-40 bg-primary/10 rounded-full blur-3xl"></div>
+<p class="text-tertiary font-bold tracking-widest uppercase text-[10px] mb-2 opacity-80">انتهاء الجولة الثانية</p>
+<h2 class="text-5xl font-black italic tracking-tighter leading-none mb-1">
+                ترتيب <span class="text-primary">الوحوش</span>
+</h2>
+</header>
+<!-- Podium / Top 3 Vertical Bento -->
+<section class="space-y-4 mb-10">
+<!-- Rank 1: Shareable High-Impact Card -->
+<div class="relative glass-card rounded-xl p-6 overflow-hidden border border-white/5 shadow-2xl">
+<div class="absolute -top-12 -left-12 w-48 h-48 bg-primary/20 rounded-full blur-3xl"></div>
+<div class="flex items-center justify-between relative z-10">
+<div class="flex items-center gap-4">
+<div class="relative">
+<div class="w-20 h-20 rounded-full p-1 bg-gradient-to-tr from-primary via-primary-container to-secondary neon-glow-primary">
+<img alt="Winner Avatar" class="w-full h-full rounded-full object-cover border-4 border-surface" data-alt="portrait of a confident stylish young person with neon lighting highlights and a futuristic aesthetic" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCkie9ISLi8p5qXf8f96HidhTRwXKNP5Cxokb-k5-8niFVRLUJCOLkaZujaA259aCUCc9M8JCvRMwsxQ4zdx9Ar9br3i_8giw0uviJwpmR3yPvDboyjILtVHfX_Xk5xYHS94Eh8CGvz0VQJfb1GVlCW4J7n_G0Px1o1NFwoQ_p7gmxWZEHnwyk7htka3PiuiZ7RbYi1eeVIMZgOY18hNivWmG05XudEDEoHXtxgXTflWrKWreS2HruqxDPXx7kK2QosDv7ahY12HQ"/>
+</div>
+<div class="absolute -bottom-1 -right-1 bg-primary text-on-primary-container text-xs font-black px-2 py-1 rounded-md rotate-12 shadow-lg">
+                                #1
+                            </div>
+</div>
+<div>
+<h3 class="text-2xl font-black text-on-surface">ياسين فودا</h3>
+<div class="flex gap-2 mt-1">
+<span class="bg-primary/20 text-primary-fixed text-[10px] font-bold px-2 py-0.5 rounded-full border border-primary/20">ملك الأسئلة</span>
+<div class="flex items-center text-error font-bold text-xs gap-0.5">
+<span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1;">local_fire_department</span>
+<span>7</span>
+</div>
+</div>
+</div>
+</div>
+<div class="text-right">
+<span class="block text-primary font-black text-3xl tabular-nums">2,850</span>
+<span class="text-[10px] text-on-surface-variant font-bold uppercase tracking-wider">نقطة</span>
+</div>
+</div>
+<!-- Share CTA inside card -->
+<button class="mt-6 w-full py-4 bg-gradient-to-r from-primary to-primary-container rounded-lg font-black text-on-primary-container flex items-center justify-center gap-2 hover:brightness-110 active:scale-95 transition-all shadow-xl">
+<span class="material-symbols-outlined" data-icon="ios_share">ios_share</span>
+                    شارك الكارد
+                </button>
+</div>
+<!-- Rank 2 & 3 Asymmetric Row -->
+<div class="grid grid-cols-2 gap-4">
+<!-- Rank 2 -->
+<div class="bg-surface-container-high rounded-lg p-4 relative overflow-hidden border border-outline-variant/10">
+<div class="flex flex-col items-center text-center gap-2">
+<div class="relative">
+<div class="w-14 h-14 rounded-full p-0.5 bg-secondary-dim shadow-[0_0_15px_rgba(46,238,156,0.2)]">
+<img alt="Rank 2 Avatar" class="w-full h-full rounded-full border-2 border-surface" data-alt="stylish profile of a gamer with cool lighting and vibrant background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDG_kN_aq54fKGiAqO-_v0ZMX80JUjByXR94qT0XzizqpS4-7K-vJK1QV7kaNIyOERuM96dQHw2savKBMGKwRq7SP14RTOgAhQbmQ0q_Q802CWI2LgUXBuctYiH5jYpVzKlVgthIwp2EomiDoA7hgrbufzkXhs89diPEDzsB7QBqyKKKxh_8tr78A4RzPK1pxUPCYkoXtioWF5qPKBOu2ck5GnvxyeAKyca3GDb-MK43J0dU-3dFVUWH7qvOnlGNJo_ijrQxM2XPw"/>
+</div>
+<span class="absolute -top-1 -right-1 bg-secondary-container text-on-secondary-container text-[10px] font-black w-5 h-5 flex items-center justify-center rounded-full">2</span>
+</div>
+<div>
+<p class="font-bold text-sm truncate w-full">سلمى نصر</p>
+<p class="text-secondary-dim font-black text-lg">2,420</p>
+</div>
+<span class="text-[9px] bg-secondary-container/30 text-secondary-fixed px-2 py-0.5 rounded-full font-bold">أسرع تخمين</span>
+</div>
+</div>
+<!-- Rank 3 -->
+<div class="bg-surface-container-high rounded-lg p-4 relative overflow-hidden border border-outline-variant/10">
+<div class="flex flex-col items-center text-center gap-2">
+<div class="relative">
+<div class="w-14 h-14 rounded-full p-0.5 bg-tertiary shadow-[0_0_15px_rgba(255,112,218,0.2)]">
+<img alt="Rank 3 Avatar" class="w-full h-full rounded-full border-2 border-surface" data-alt="profile photo of a young person with vibrant pink lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCdgrom7GedMqvPqjPhseubaJkmnpHBF0BgONsT4wzlC9NWw7-OHYfRr2wE3caUZ1TLksLxYToi3sv8VaWqnYNqRaKKOcInUsJMfXWEMGxTsTPP_y7mL8Ul7qywoQ5l_wHLNe6SOEimyw5HUwSLSZt_rKGV0hiX3Re2dg9hN_nZzGBbCxExDKe8c6E0QFqg1kjgQLIUfJshuvZQMQtU1_YlBxEf71_qzup-cvijyEgen9y-OF6XWCg0VJAmh24EugY_wBDhtSXwHw"/>
+</div>
+<span class="absolute -top-1 -right-1 bg-tertiary-container text-on-tertiary-container text-[10px] font-black w-5 h-5 flex items-center justify-center rounded-full">3</span>
+</div>
+<div>
+<p class="font-bold text-sm truncate">كريم زيدان</p>
+<p class="text-tertiary font-black text-lg">2,100</p>
+</div>
+<div class="flex items-center text-error font-bold text-xs gap-0.5">
+<span class="material-symbols-outlined text-xs" style="font-variation-settings: 'FILL' 1;">local_fire_department</span>
+<span>4</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Other Players List -->
+<section class="space-y-3">
+<h4 class="text-on-surface-variant font-bold text-xs uppercase tracking-widest px-2 mb-4 flex items-center justify-between">
+<span>باقي الشلة</span>
+<span class="material-symbols-outlined text-sm" data-icon="expand_more">expand_more</span>
+</h4>
+<!-- List Item 4 -->
+<div class="flex items-center justify-between p-4 bg-surface-container-low rounded-lg border border-white/5 group hover:bg-surface-container transition-colors">
+<div class="flex items-center gap-4">
+<span class="text-on-surface-variant font-black italic text-lg w-4">4</span>
+<img alt="Player 4" class="w-10 h-10 rounded-full grayscale group-hover:grayscale-0 transition-all" data-alt="headshot of a smiling young person with trendy fashion and soft studio lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDw6TPY1fvEkEf50ZUyEK01ChWpmjBeB0aZ0GOZHcXcK-Jzfh7r4qC1yI_K2u9i7iQ1SxFjf09PgQS-nSgurHb9Q5a32rVCEYcGi6OphnN4Jb6HexouqRrXjcjd1V6oP1J3Er8MkUyBnN7MqBtzp7vijjRTHBS6EBQmiZhD-Ey8vg-Sbus1PHxTEEYW3CpgFHVAKXbQSoYkQG2vHAF9C6NNjZsSv_Kf0pIraWajBmRf43lFID-WGYbQJp0NggSMWWV1QkiVEpBPwA"/>
+<div>
+<p class="font-bold text-on-surface">عمر الشريف</p>
+<p class="text-[10px] text-on-surface-variant">محتاج يركز شوية</p>
+</div>
+</div>
+<div class="text-right">
+<p class="font-black text-on-surface">1,890</p>
+<div class="flex justify-end gap-1">
+<div class="w-1 h-1 rounded-full bg-primary/40"></div>
+<div class="w-1 h-1 rounded-full bg-primary/40"></div>
+</div>
+</div>
+</div>
+<!-- List Item 5 -->
+<div class="flex items-center justify-between p-4 bg-surface-container-low rounded-lg border border-white/5 group hover:bg-surface-container transition-colors">
+<div class="flex items-center gap-4">
+<span class="text-on-surface-variant font-black italic text-lg w-4">5</span>
+<img alt="Player 5" class="w-10 h-10 rounded-full grayscale group-hover:grayscale-0 transition-all" data-alt="portrait of a young person in a casual setting with warm natural lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuClM3zQAwflRfamVYbUuKHg3LoIkAYBiio7GJC13aiJaEeXlfuRhUtsSftVn8dc-mrA-U4ndZGLROI-BVSbMLYreD67IWWY7dCMQaxWBU7hWbA_VYOzRigDdUXMz8M1NNEscaajCI9-QsSz8p9ImtF_ZvQJdKsTgTlMPo0IVXtfBhFvFjEcQTb1Myw5ObDkUKUtNIwIGX49AGlX73qazTuDIDOl-MK61XBQhoa3YlLw1mtTvRWPbPyd2iujaWu_448SJf1ZJ6B2nw"/>
+<div>
+<p class="font-bold text-on-surface">نور علي</p>
+<p class="text-[10px] text-on-surface-variant">لسه في أمل</p>
+</div>
+</div>
+<div class="text-right">
+<p class="font-black text-on-surface">1,500</p>
+</div>
+</div>
+<!-- List Item You (Active State) -->
+<div class="flex items-center justify-between p-4 bg-primary-container/20 rounded-lg border border-primary/20 ring-1 ring-primary/30">
+<div class="flex items-center gap-4">
+<span class="text-primary font-black italic text-lg w-4">8</span>
+<div class="relative">
+<img alt="User Avatar" class="w-10 h-10 rounded-full border-2 border-primary shadow-[0_0_10px_rgba(255,178,43,0.2)]" data-alt="casual selfie of a young man with a friendly expression and cool modern background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCKGyKJlakyu3hqAIGPcVQh0ZJjqBAKyyTnNybD3x09xwnSV8jgESysUF2GNlqFG57Pu3dhnIzIv9k9pAqNpDd2k22yWceUj4BBJ6ycu_zMFHyNwvfELlMBHpZgy7DvoTQFcwqI7gHnluOHFJEFFGcP6k_1URdGKRY4I7WElyF5giwR70FfIPwrP77tDstqYx8aeRnttaIxDRyny57380BwEsiTIRMOZnU2OMtEeXey0q0U0Bxr6IhD3HgGYerqj8gEqr9Mri96DA"/>
+<div class="absolute -top-1 -left-1 bg-error rounded-full w-3 h-3 border-2 border-surface"></div>
+</div>
+<div>
+<p class="font-black text-primary">أنا (محمد)</p>
+<p class="text-[10px] text-primary/80">شغال بتعرق!</p>
+</div>
+</div>
+<div class="text-right">
+<p class="font-black text-primary">920</p>
+<span class="text-[9px] bg-error/10 text-error px-1.5 py-0.5 rounded-full font-bold">زحليقة</span>
+</div>
+</div>
+</section>
+<!-- Vertical Ad/Promo Asymmetric -->
+<div class="mt-12 p-6 bg-surface-container-highest rounded-xl relative overflow-hidden">
+<div class="absolute top-0 right-0 p-2">
+<span class="text-[8px] font-bold text-white/20 uppercase">ADVERTISEMENT</span>
+</div>
+<div class="flex items-center gap-4">
+<div class="w-16 h-16 rounded-lg bg-white/5 flex items-center justify-center border border-white/10 shrink-0">
+<span class="material-symbols-outlined text-3xl text-secondary" data-icon="stadium">stadium</span>
+</div>
+<div>
+<h5 class="font-bold text-secondary">دوري القاهرة الكبرى</h5>
+<p class="text-xs text-on-surface-variant">اشترك دلوقتي واكسب جوايز حقيقية كل أسبوع!</p>
+</div>
+</div>
+</div>
+</main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-8 pb-6 pt-2 bg-white/10 backdrop-blur-2xl rounded-t-[3rem] shadow-[0_-10px_40px_rgba(0,0,0,0.5)]">
+<a class="flex flex-col items-center justify-center text-white/40 p-3 hover:text-white transition-colors" href="#">
+<span class="material-symbols-outlined text-2xl" data-icon="home">home</span>
+</a>
+<a class="flex flex-col items-center justify-center text-white/40 p-3 hover:text-white transition-colors" href="#">
+<span class="material-symbols-outlined text-2xl" data-icon="sports_esports">sports_esports</span>
+</a>
+<a class="flex flex-col items-center justify-center bg-gradient-to-tr from-[#FFB020] to-[#f1a40c] text-[#0a0e16] rounded-full p-3 shadow-[0_0_20px_rgba(255,176,32,0.4)] scale-110" href="#">
+<span class="material-symbols-outlined text-2xl" data-icon="leaderboard">leaderboard</span>
+</a>
+<a class="flex flex-col items-center justify-center text-white/40 p-3 hover:text-white transition-colors" href="#">
+<span class="material-symbols-outlined text-2xl" data-icon="person">person</span>
+</a>
+</nav>
+<!-- Floating Action Button for Next Round (Task-Aligned) -->
+<button class="fixed bottom-28 left-6 w-16 h-16 bg-white text-surface rounded-full flex items-center justify-center shadow-[0_15px_30px_rgba(0,0,0,0.4)] active:scale-90 transition-transform">
+<span class="material-symbols-outlined text-3xl" data-icon="play_arrow" style="font-variation-settings: 'FILL' 1;">play_arrow</span>
+</button>
+</body></html>

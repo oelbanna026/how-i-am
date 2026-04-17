@@ -1,0 +1,235 @@
+<html class="dark" dir="rtl" lang="ar"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;family=Cairo:wght@400;600;700;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "primary-fixed-dim": "#ea9f00",
+            "tertiary-dim": "#ff5dd9",
+            "surface-container-highest": "#202632",
+            "on-tertiary": "#500042",
+            "on-tertiary-fixed": "#34002a",
+            "surface-container-low": "#0f131c",
+            "primary-dim": "#ea9f00",
+            "primary": "#ffb22b",
+            "secondary-dim": "#2eee9c",
+            "on-tertiary-container": "#38002e",
+            "surface": "#0a0e16",
+            "on-surface-variant": "#a8abb6",
+            "secondary-fixed": "#45fda9",
+            "surface-container": "#151a23",
+            "on-secondary": "#005c39",
+            "on-tertiary-fixed-variant": "#6f005c",
+            "primary-fixed": "#faac1a",
+            "surface-bright": "#262c39",
+            "error-dim": "#d53d18",
+            "on-secondary-fixed": "#00472b",
+            "on-surface": "#eef0fc",
+            "tertiary-fixed-dim": "#ff6ad9",
+            "on-primary-fixed-variant": "#5b3b00",
+            "surface-container-high": "#1a202a",
+            "background": "#0a0e16",
+            "surface-container-lowest": "#000000",
+            "on-secondary-fixed-variant": "#006740",
+            "inverse-primary": "#825600",
+            "on-secondary-container": "#e1ffe9",
+            "on-primary": "#543600",
+            "error": "#ff7351",
+            "secondary-fixed-dim": "#2eee9c",
+            "tertiary-container": "#fe4ed7",
+            "primary-container": "#f1a40c",
+            "secondary": "#45fda9",
+            "outline": "#727580",
+            "inverse-on-surface": "#51555f",
+            "error-container": "#b92902",
+            "on-background": "#eef0fc",
+            "on-primary-fixed": "#331f00",
+            "surface-tint": "#ffb22b",
+            "outline-variant": "#444851",
+            "inverse-surface": "#f9f9ff",
+            "on-error": "#450900",
+            "surface-variant": "#202632",
+            "on-error-container": "#ffd2c8",
+            "tertiary-fixed": "#ff87dc",
+            "tertiary": "#ff70da",
+            "on-primary-container": "#472d00",
+            "surface-dim": "#0a0e16",
+            "secondary-container": "#006d43"
+          },
+          "borderRadius": {
+            "DEFAULT": "1rem",
+            "lg": "2rem",
+            "xl": "3rem",
+            "full": "9999px"
+          },
+          "fontFamily": {
+            "headline": ["Cairo", "Plus Jakarta Sans"],
+            "body": ["Cairo", "Plus Jakarta Sans"],
+            "label": ["Cairo", "Plus Jakarta Sans"]
+          }
+        },
+      },
+    }
+  </script>
+<style>
+    body { font-family: 'Cairo', 'Plus Jakarta Sans', sans-serif; }
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    }
+    .glass-card {
+      background: rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(20px);
+    }
+    .neon-glow {
+      box-shadow: 0 0 30px -10px rgba(255, 178, 43, 0.3);
+    }
+  </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface text-on-surface min-h-screen pb-32">
+<!-- TopAppBar -->
+<header class="fixed top-0 left-0 w-full z-50 flex items-center justify-between px-6 h-16 bg-[#0a0e16]/80 backdrop-blur-xl shadow-[0_0_40px_-15px_rgba(255,176,32,0.15)]">
+<div class="flex items-center gap-4">
+<button class="flex items-center justify-center w-10 h-10 rounded-full hover:bg-white/10 transition-all active:scale-95">
+<span class="material-symbols-outlined text-[#FFB020]">arrow_forward</span>
+</button>
+<h1 class="text-[#FFB020] font-['Plus_Jakarta_Sans'] font-bold tracking-tight text-xl">مين أنا؟</h1>
+</div>
+<div class="flex items-center gap-2">
+<button class="flex items-center justify-center w-10 h-10 rounded-full hover:bg-white/10 transition-all active:scale-95">
+<span class="material-symbols-outlined text-[#FFB020]">group</span>
+</button>
+<button class="flex items-center justify-center w-10 h-10 rounded-full hover:bg-white/10 transition-all active:scale-95">
+<span class="material-symbols-outlined text-[#FFB020]">share</span>
+</button>
+</div>
+</header>
+<!-- Main Canvas -->
+<main class="mt-20 px-6 max-w-lg mx-auto space-y-8">
+<!-- Hero Title -->
+<div class="space-y-2">
+<span class="text-tertiary-dim font-bold text-xs uppercase tracking-widest px-3 py-1 bg-tertiary-container/20 rounded-full">إعدادات اللعبة</span>
+<h2 class="text-4xl font-black text-on-surface leading-tight">جهز قعدتك، <br/><span class="text-primary">ولع اللعبة!</span></h2>
+</div>
+<!-- Room Name Input -->
+<section class="space-y-4">
+<label class="text-on-surface-variant font-bold text-sm mr-2 block">اسم الأوضة</label>
+<div class="relative group">
+<input class="w-full bg-surface-container-lowest border-none rounded-lg p-5 text-xl font-bold text-primary focus:ring-2 focus:ring-primary/50 transition-all outline-none placeholder-white/20" placeholder="اكتب اسم جامد..." type="text" value="لمة الجمعة"/>
+<div class="absolute inset-y-0 left-5 flex items-center">
+<span class="material-symbols-outlined text-primary/40">edit</span>
+</div>
+</div>
+</section>
+<!-- Asymmetric Grid for Steppers -->
+<div class="grid grid-cols-12 gap-4">
+<!-- Players Stepper -->
+<div class="col-span-7 glass-card rounded-xl p-6 border border-white/5 space-y-4">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-secondary text-xl">groups</span>
+<label class="text-on-surface font-bold text-sm">عدد اللعيبة</label>
+</div>
+<div class="flex items-center justify-between bg-surface-container-highest rounded-full p-2">
+<button class="w-10 h-10 rounded-full bg-surface-bright flex items-center justify-center text-white active:scale-90 transition-all shadow-lg">
+<span class="material-symbols-outlined">remove</span>
+</button>
+<span class="text-2xl font-black font-['Plus_Jakarta_Sans']">8</span>
+<button class="w-10 h-10 rounded-full bg-secondary text-on-secondary flex items-center justify-center active:scale-90 transition-all shadow-lg">
+<span class="material-symbols-outlined">add</span>
+</button>
+</div>
+<p class="text-[10px] text-on-surface-variant text-center">بين 4 لـ 12 لاعب</p>
+</div>
+<!-- Rounds Stepper -->
+<div class="col-span-5 glass-card rounded-xl p-6 border border-white/5 space-y-4">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-tertiary text-xl">reorder</span>
+<label class="text-on-surface font-bold text-sm">الجولات</label>
+</div>
+<div class="flex flex-col items-center justify-center space-y-2">
+<span class="text-4xl font-black text-tertiary">5</span>
+<div class="flex gap-4">
+<button class="text-white/40 hover:text-white transition-colors">
+<span class="material-symbols-outlined">keyboard_arrow_up</span>
+</button>
+<button class="text-white/40 hover:text-white transition-colors">
+<span class="material-symbols-outlined">keyboard_arrow_down</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Timer Segmented Control -->
+<section class="space-y-4">
+<div class="flex items-center justify-between">
+<label class="text-on-surface font-bold text-sm flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-xl">timer</span>
+          وقت التفكير
+        </label>
+<span class="text-primary-dim text-xs font-bold">ثانية</span>
+</div>
+<div class="grid grid-cols-3 gap-3 p-1 bg-surface-container-high rounded-lg">
+<button class="py-4 rounded-md text-on-surface-variant font-bold hover:bg-white/5 transition-all">30</button>
+<button class="py-4 rounded-md bg-gradient-to-tr from-primary to-primary-container text-on-primary font-black shadow-lg neon-glow">60</button>
+<button class="py-4 rounded-md text-on-surface-variant font-bold hover:bg-white/5 transition-all">90</button>
+</div>
+</section>
+<!-- Privacy Toggle Card -->
+<div class="glass-card rounded-xl p-6 border border-white/5 flex items-center justify-between relative overflow-hidden">
+<div class="relative z-10">
+<h3 class="font-bold text-lg">خصوصية الأوضة</h3>
+<p class="text-on-surface-variant text-sm">عايز اللعبة تكون عامة ولا خاصة؟</p>
+</div>
+<div class="relative z-10 flex items-center gap-3">
+<span class="text-xs font-bold text-white/40">خاصة</span>
+<div class="w-14 h-8 bg-primary rounded-full p-1 flex items-center justify-end shadow-inner cursor-pointer">
+<div class="w-6 h-6 bg-on-primary rounded-full shadow-md"></div>
+</div>
+<span class="text-xs font-bold text-primary">عامة</span>
+</div>
+<!-- Decorative radial gradient for street style -->
+<div class="absolute -right-4 -bottom-4 w-24 h-24 bg-primary/10 blur-3xl rounded-full"></div>
+</div>
+<!-- Visual Hint Image -->
+<div class="relative h-48 rounded-xl overflow-hidden group">
+<img alt="Gaming party setup" class="w-full h-full object-cover opacity-40 group-hover:scale-110 transition-transform duration-700" data-alt="Modern gaming lounge setup with neon amber lighting, game controllers, and a social vibe for a group of friends" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAPKZFnyaUc1kd3YVMg56sFYTpesmyXelEiFEXo06QM6vKWf1rsrwAjsyEC5FeKJRTYnD_anHOOzG8NdSXsAdmXe7vp7MQSY36pdoGOxOT-J3YIzJnrSeQhrJ_RuXIhZZaFONJrbo8TyB9ibE-8oH8s78LhF9FxVGAzek26CydXG_Z8uNtXzCyQZQHHKVSw0rsCXRiL9h6ODcePexNbwxJBc9mAZegUktSpCUVzRshEixxalgkuScqXiqsP3r1lh7IcUJNrund7Qg"/>
+<div class="absolute inset-0 bg-gradient-to-t from-surface to-transparent"></div>
+<div class="absolute bottom-4 right-4 left-4">
+<p class="text-on-surface-variant text-xs italic">"أسرع إعداد لأقوى لمة في مصر"</p>
+</div>
+</div>
+</main>
+<!-- Fixed Bottom CTA & NavBar Suppression (Suppressed as per task context but adding the CTA as requested) -->
+<div class="fixed bottom-0 left-0 w-full p-6 z-50 pointer-events-none">
+<button class="pointer-events-auto w-full h-16 bg-gradient-to-r from-primary to-primary-container text-on-primary font-black text-xl rounded-lg shadow-[0_10px_40px_rgba(255,178,43,0.3)] flex items-center justify-center gap-3 active:scale-95 transition-all">
+<span class="material-symbols-outlined">rocket_launch</span>
+      اعمل الأوضة وابعِت الدعوة
+    </button>
+</div>
+<!-- BottomNavBar (Hidden for transactional flow as per Shell Visibility Rule) -->
+<nav class="hidden fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-8 pb-6 pt-2 bg-white/10 backdrop-blur-2xl rounded-t-[3rem] shadow-[0_-10px_40px_rgba(0,0,0,0.5)]">
+<div class="flex flex-col items-center justify-center text-white/40 p-3 hover:text-white transition-colors">
+<span class="material-symbols-outlined">home</span>
+</div>
+<div class="flex flex-col items-center justify-center text-white/40 p-3 hover:text-white transition-colors">
+<span class="material-symbols-outlined">sports_esports</span>
+</div>
+<div class="flex flex-col items-center justify-center text-white/40 p-3 hover:text-white transition-colors">
+<span class="material-symbols-outlined">leaderboard</span>
+</div>
+<div class="flex flex-col items-center justify-center text-white/40 p-3 hover:text-white transition-colors">
+<span class="material-symbols-outlined">person</span>
+</div>
+</nav>
+</body></html>
