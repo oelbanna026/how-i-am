@@ -759,7 +759,8 @@ export const gameActions = {
           store.setState({
             gameState: normalizedPayload,
             timer: buildTimerFromPayload(payload),
-            players: normalizedPlayers ?? store.getState().players
+            players: normalizedPlayers ?? store.getState().players,
+            roundResult: null
           });
         },
         onQuestionReceived: (payload) => {
@@ -772,6 +773,7 @@ export const gameActions = {
             return {
               ...s,
               gameState: prev ? { ...(prev as any), questions: nextQs } : prev,
+              roundResult: null,
               messages: [{ id: id(), ts: nowMs(), type: 'question', text: q?.text ?? 'Question', payload: q }, ...s.messages].slice(0, 100)
             };
           });
@@ -802,15 +804,7 @@ export const gameActions = {
                     questions: nextQs
                   }
                 : prev,
-              roundResult: payload?.complete
-                ? {
-                    questionId: payload?.questionId ?? null,
-                    majority: payload?.majority ?? null,
-                    yesCount: payload?.yesCount ?? null,
-                    noCount: payload?.noCount ?? null,
-                    scores: payload?.scores ?? null
-                  }
-                : s.roundResult,
+              roundResult: null,
               messages: [
                 {
                   id: id(),
