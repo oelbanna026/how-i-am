@@ -53,6 +53,7 @@ export type GameStoreState = {
     profanityFilter: boolean;
     accent: 'primary' | 'tertiary' | 'secondary' | 'error' | 'custom';
   };
+  lastReaction: { emoji: string; fromId: string; fromName: string; ts: number } | null;
   profile: { name: string; avatarId: string; coins: number };
   unlockedCategories: string[];
   messages: Message[];
@@ -95,7 +96,7 @@ function defaultServerUrl() {
   if (fromEnv) return fromEnv;
   const host = guessDevHost();
   if (host) return `http://${host}:3002`;
-  return 'http://192.168.8.60:3002';
+  return 'https://how-i-am.onrender.com';
 }
 
 function toAssetUrl(serverUrl: string, imagePath: string | null | undefined) {
@@ -595,6 +596,7 @@ class Store {
       blockedUserIds: [],
       reportTargetUserId: null,
       ui: { language: 'ar', sound: true, voice: true, haptics: true, reduceMotion: false, profanityFilter: true, accent: 'primary' },
+      lastReaction: null,
       profile: { name: 'Guest', avatarId: 'a1', coins: 100 },
       unlockedCategories: ['All'],
       messages: [],
@@ -677,7 +679,36 @@ export const gameActions = {
         }
       } catch {}
       listenToEvents({
-        onConnect: () => store.setState({ connected: true }),
+        onConnect: () => {
+          store.setState({ connected: true });
+          void (async () => {
+            const s = store.getState();
+            const code = String((s.currentRoom as any)?.roomCode ?? (s.currentRoom as any)?.code ?? '').trim().toUpperCase();
+            const userId = String(s.userId ?? '').trim();
+            const sessionToken = String(s.sessionToken ?? '').trim();
+            if (!code || code === 'OFFLINE') return;
+            if (!userId || !sessionToken) return;
+            try {
+              await emitAck('joinRoom', { code, userId, name: s.profile.name, sessionToken });
+            } catch (e: any) {
+              const msg = String(e?.message ?? e);
+              if (msg === 'ALREADY_IN_ROOM') return;
+              if (msg === 'ROOM_NOT_FOUND' || msg === 'RECONNECT_WINDOW_EXPIRED' || msg === 'INVALID_SESSION') {
+                store.setState({
+                  currentRoom: null,
+                  players: [],
+                  gameState: null,
+                  myCard: null,
+                  timer: null,
+                  roundResult: null,
+                  sessionToken: null,
+                  error: msg
+                });
+                return;
+              }
+            }
+          })();
+        },
         onDisconnect: () => store.setState({ connected: false }),
         onRoomUpdate: (payload) => {
           const blocked = new Set(store.getState().blockedUserIds.map(String));
@@ -732,37 +763,81 @@ export const gameActions = {
           });
         },
         onQuestionReceived: (payload) => {
-          store.setState({
-            messages: [
-              { id: id(), ts: nowMs(), type: 'question', text: payload?.question?.text ?? 'Question', payload },
-              ...store.getState().messages
-            ].slice(0, 100)
+          store.setState((s) => {
+            const q = payload?.question ?? null;
+            const qid = String(q?.id ?? '');
+            const prev = s.gameState;
+            const prevQs = Array.isArray((prev as any)?.questions) ? (prev as any).questions : [];
+            const nextQs = qid ? [q, ...prevQs.filter((x: any) => String(x?.id ?? '') !== qid)] : prevQs;
+            return {
+              ...s,
+              gameState: prev ? { ...(prev as any), questions: nextQs } : prev,
+              messages: [{ id: id(), ts: nowMs(), type: 'question', text: q?.text ?? 'Question', payload: q }, ...s.messages].slice(0, 100)
+            };
           });
         },
         onAnswerResult: (payload) => {
-          store.setState({
-            gameState: store.getState().gameState
-              ? { ...store.getState().gameState, scores: payload?.scores ?? store.getState().gameState?.scores }
-              : store.getState().gameState,
-            roundResult: payload?.complete
-              ? {
-                  questionId: payload?.questionId ?? null,
-                  majority: payload?.majority ?? null,
-                  yesCount: payload?.yesCount ?? null,
-                  noCount: payload?.noCount ?? null,
-                  scores: payload?.scores ?? null
-                }
-              : store.getState().roundResult,
-            messages: [
-              {
-                id: id(),
-                ts: nowMs(),
-                type: 'answer',
-                text: payload?.complete ? `Majority: ${payload?.majority ?? 'TIE'}` : 'Answer received',
-                payload
-              },
-              ...store.getState().messages
-            ].slice(0, 100)
+          store.setState((s) => {
+            const prev = s.gameState;
+            const qid = String(payload?.questionId ?? '');
+            const prevQs = Array.isArray((prev as any)?.questions) ? (prev as any).questions : [];
+            const nextQs = qid
+              ? prevQs.map((q: any) => {
+                  if (String(q?.id ?? '') !== qid) return q;
+                  return {
+                    ...q,
+                    answers: payload?.answers ?? q?.answers,
+                    majority: payload?.majority ?? q?.majority,
+                    yesCount: payload?.yesCount ?? q?.yesCount,
+                    noCount: payload?.noCount ?? q?.noCount
+                  };
+                })
+              : prevQs;
+            return {
+              ...s,
+              gameState: prev
+                ? {
+                    ...(prev as any),
+                    scores: payload?.scores ?? (prev as any).scores,
+                    questions: nextQs
+                  }
+                : prev,
+              roundResult: payload?.complete
+                ? {
+                    questionId: payload?.questionId ?? null,
+                    majority: payload?.majority ?? null,
+                    yesCount: payload?.yesCount ?? null,
+                    noCount: payload?.noCount ?? null,
+                    scores: payload?.scores ?? null
+                  }
+                : s.roundResult,
+              messages: [
+                {
+                  id: id(),
+                  ts: nowMs(),
+                  type: 'answer',
+                  text: payload?.complete ? `Majority: ${payload?.majority ?? 'TIE'}` : 'Answer received',
+                  payload
+                },
+                ...s.messages
+              ].slice(0, 100)
+            };
+          });
+        },
+        onReaction: (payload) => {
+          const fromId = String(payload?.userId ?? '');
+          const emoji = String(payload?.emoji ?? '').trim();
+          if (!fromId || !emoji) return;
+          store.setState((s) => {
+            const fromName =
+              s.players.find((p: any) => String(p?.id ?? '') === fromId)?.name ??
+              s.recentPlayers.find((p: any) => String(p?.id ?? '') === fromId)?.name ??
+              fromId.slice(0, 4);
+            return {
+              ...s,
+              lastReaction: { emoji, fromId, fromName, ts: Number(payload?.ts ?? nowMs()) || nowMs() },
+              messages: [{ id: id(), ts: nowMs(), type: 'reaction', text: `${fromName} ${emoji}`, payload }, ...s.messages].slice(0, 100)
+            };
           });
         },
         onGuessResult: (payload) => {
@@ -939,6 +1014,19 @@ export const gameActions = {
   async setReady(ready: boolean) {
     await emitAck('setReady', { ready });
     void audioService.playSFX('player_ready').catch(() => null);
+  },
+
+  async sendReaction(emoji: string) {
+    const e = String(emoji ?? '').trim().slice(0, 4);
+    if (!e) return;
+    if (isOfflineRoom(store.getState().currentRoom)) {
+      store.setState((s) => ({
+        lastReaction: { emoji: e, fromId: String(s.userId ?? ''), fromName: String(s.profile.name ?? 'You'), ts: nowMs() },
+        messages: [{ id: id(), ts: nowMs(), type: 'reaction', text: e, payload: { emoji: e } }, ...s.messages].slice(0, 100)
+      }));
+      return;
+    }
+    await emitAck('sendReaction', { emoji: e });
   },
 
   async startOfflineGame() {

@@ -146,6 +146,13 @@ true;
       const txt = String(e.text ?? '').replace(/\s+/g, ' ').trim();
       const icon = e.dataIcon ?? null;
 
+      if (txt === '😂' || txt === '🔥' || txt === '👏' || txt === '🤯' || txt === '👾') {
+        try {
+          await gameActions.sendReaction(txt);
+        } catch {}
+        return;
+      }
+
       if (action === 'leave_room' || icon === 'group' || txt === 'group') {
         await gameActions.leaveRoom();
         onBackToHome();

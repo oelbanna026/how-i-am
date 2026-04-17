@@ -528,6 +528,18 @@ async function main() {
       }
     });
 
+    socket.on('sendReaction', async (payload, ack) => {
+      try {
+        const { code, userId } = requireInRoom();
+        const emoji = String(payload?.emoji ?? '').trim().slice(0, 4);
+        if (!emoji) throw new Error('MISSING_EMOJI');
+        io.to(code).emit('reaction', { roomCode: code, userId, emoji, ts: Date.now() });
+        if (typeof ack === 'function') ack({ ok: true });
+      } catch (e) {
+        if (typeof ack === 'function') ack({ ok: false, error: String(e?.message ?? e) });
+      }
+    });
+
     socket.on('makeGuess', async (payload, ack) => {
       try {
         const { code, userId } = requireInRoom();

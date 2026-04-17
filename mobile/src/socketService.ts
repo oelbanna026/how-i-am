@@ -11,6 +11,7 @@ export type SocketHandlers = {
   onAnswerResult?: (payload: any) => void;
   onGuessResult?: (payload: any) => void;
   onGameEnd?: (payload: any) => void;
+  onReaction?: (payload: any) => void;
   onUserJoinedVoice?: (payload: any) => void;
   onUserLeftVoice?: (payload: any) => void;
   onUserMuted?: (payload: any) => void;
@@ -90,6 +91,7 @@ export function listenToEvents(handlers: SocketHandlers) {
   socket.on('answerResult', (p) => handlers.onAnswerResult?.(p));
   socket.on('guessResult', (p) => handlers.onGuessResult?.(p));
   socket.on('gameEnd', (p) => handlers.onGameEnd?.(p));
+  socket.on('reaction', (p) => handlers.onReaction?.(p));
 
   socket.on('userJoinedVoice', (p) => handlers.onUserJoinedVoice?.(p));
   socket.on('userLeftVoice', (p) => handlers.onUserLeftVoice?.(p));

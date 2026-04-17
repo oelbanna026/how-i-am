@@ -24,6 +24,7 @@ export function GameScreen({
   const room = useGameStore((s) => s.currentRoom);
   const [question, setQuestion] = useState('');
   const [reaction, setReaction] = useState<string | null>(null);
+  const lastReaction = useGameStore((s) => s.lastReaction);
   const lastTickSecRef = useRef<number | null>(null);
   const prevIsMyTurnRef = useRef<boolean | null>(null);
   const prevTimeUpRef = useRef<boolean>(false);
@@ -40,6 +41,17 @@ export function GameScreen({
 
   const offline = String(room?.roomCode ?? '') === 'OFFLINE';
   const offlineState = game?.offline ?? null;
+  const latestQuestion = game?.questions?.[0] ?? null;
+  const latestAnswers = latestQuestion && typeof (latestQuestion as any).answers === 'object' ? (latestQuestion as any).answers : null;
+  const answerMode =
+    !offline &&
+    Boolean(latestQuestion?.id) &&
+    String((latestQuestion as any)?.askedBy ?? '') !== String(userId) &&
+    latestAnswers &&
+    Object.prototype.hasOwnProperty.call(latestAnswers, String(userId)) &&
+    latestAnswers[String(userId)] == null;
+  const questionOpen =
+    Boolean(latestQuestion?.id) && latestAnswers ? Object.values(latestAnswers).some((v: any) => v == null) : false;
   const isAiTurn = offline && !isMyTurn && String(latestQ?.askedBy ?? '') === 'bot_ai_1';
 
   useEffect(() => {
@@ -47,6 +59,12 @@ export function GameScreen({
     const t = setTimeout(() => setReaction(null), 650);
     return () => clearTimeout(t);
   }, [reaction]);
+
+  const reactionText = useMemo(() => {
+    if (reaction) return `تم إرسال ${reaction}`;
+    if (lastReaction?.emoji && lastReaction?.fromName) return `${lastReaction.fromName} ${lastReaction.emoji}`;
+    return null;
+  }, [lastReaction?.emoji, lastReaction?.fromName, reaction]);
 
   useEffect(() => {
     const prev = prevIsMyTurnRef.current;
@@ -86,6 +104,7 @@ export function GameScreen({
         var p = payload || {};
         var offline = Boolean(p.offline);
         var isMyTurn = Boolean(p.isMyTurn);
+        var answerMode = Boolean(p.answerMode);
 
         try {
           var timerEl = document.querySelector('header span.font-mono');
@@ -134,15 +153,36 @@ export function GameScreen({
           }
         } catch (e) {}
 
+        try {
+          if (!offline) {
+            var title2 = document.querySelector('main h2');
+            var sub2 = document.querySelector('main p');
+            var help2 = document.querySelector('main span.material-symbols-outlined.animate-pulse');
+            if (answerMode && typeof p.questionText === 'string' && p.questionText) {
+              if (title2) title2.textContent = p.questionText;
+              if (sub2) sub2.textContent = 'جاوب على السؤال';
+              if (help2) help2.style.display = 'none';
+              try {
+                if (title2) title2.style.textShadow = '0 6px 18px rgba(0,0,0,0.75)';
+                if (sub2) sub2.style.textShadow = '0 6px 18px rgba(0,0,0,0.75)';
+              } catch (e) {}
+            } else if (isMyTurn) {
+              if (title2) title2.textContent = 'مين ده؟';
+              if (sub2) sub2.textContent = 'إسأل زمايلك عشان تعرف';
+              if (help2) help2.style.display = '';
+            }
+          }
+        } catch (e) {}
+
         var answerTitle = Array.prototype.slice.call(document.querySelectorAll('h3') || []).find(function (h) {
           return norm(h.textContent).indexOf('أديله إجابة') >= 0;
         });
-        if (answerTitle && offline && isMyTurn) {
+        if (answerTitle) {
           var wrap = answerTitle.parentElement;
-          if (wrap) wrap.style.display = 'none';
-        } else if (answerTitle) {
-          var wrap2 = answerTitle.parentElement;
-          if (wrap2) wrap2.style.display = '';
+          if (wrap) {
+            if (offline) wrap.style.display = (isMyTurn ? 'none' : '');
+            else wrap.style.display = answerMode ? '' : 'none';
+          }
         }
 
         var inputSection = document.querySelector('section.flex.flex-col.gap-4');
@@ -197,6 +237,27 @@ export function GameScreen({
         } catch (e) {}
 
         try {
+          if (!offline) {
+            var sendBtn2 = Array.prototype.slice.call(document.querySelectorAll('button') || []).find(function (b) {
+              return norm(b.textContent).indexOf('send') >= 0;
+            });
+            var qBtns2 = Array.prototype.slice.call(document.querySelectorAll('section.flex.flex-col.gap-4 button') || []);
+            var disableAsk = Boolean(p.questionOpen) || !isMyTurn;
+            qBtns2.forEach(function (b) {
+              b.disabled = disableAsk;
+              b.style.opacity = disableAsk ? '0.55' : '1';
+            });
+            if (sendBtn2) {
+              sendBtn2.disabled = disableAsk;
+              sendBtn2.style.opacity = disableAsk ? '0.55' : '1';
+            }
+
+            if (inputSection) inputSection.style.display = isMyTurn ? '' : 'none';
+            if (guessBtn) guessBtn.style.display = isMyTurn ? '' : 'none';
+          }
+        } catch (e) {}
+
+        try {
           var toast = document.getElementById('rn-toast');
           if (!toast) {
             toast = document.createElement('div');
@@ -215,8 +276,8 @@ export function GameScreen({
             toast.style.display = 'none';
             document.body.appendChild(toast);
           }
-          if (p.reaction) {
-            toast.textContent = 'تم إرسال ' + String(p.reaction);
+          if (p.reactionText) {
+            toast.textContent = String(p.reactionText);
             toast.style.display = 'block';
           } else {
             toast.style.display = 'none';
@@ -244,6 +305,9 @@ true;
 
       if (clickText === '🔥' || clickText === '😂' || clickText === '🤔' || clickText === '💀' || clickText === '👏') {
         setReaction(clickText);
+        try {
+          await gameActions.sendReaction(clickText);
+        } catch {}
         return;
       }
 
@@ -354,12 +418,15 @@ true;
       syncPayload={{
         offline,
         isMyTurn,
+        answerMode,
+        questionOpen,
+        questionText: typeof (latestQuestion as any)?.text === 'string' ? String((latestQuestion as any).text) : null,
         waitingAi: Boolean(offlineState?.waiting),
         aiAnswer: offlineState?.lastAnswer ?? null,
         guessWrong: Boolean(offlineState?.lastGuessCorrect === false),
         botImageUri: offlineState?.botCard?.imageUri ?? null,
         activeQuestionText: typeof latestQ?.text === 'string' ? latestQ.text : null,
-        reaction,
+        reactionText,
         timerText,
         roundText
       }}
