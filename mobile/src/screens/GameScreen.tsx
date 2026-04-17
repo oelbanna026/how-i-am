@@ -25,9 +25,11 @@ export function GameScreen({
   const [question, setQuestion] = useState('');
   const [reaction, setReaction] = useState<string | null>(null);
   const lastReaction = useGameStore((s) => s.lastReaction);
+  const lastToast = useGameStore((s) => s.lastToast);
   const lastTickSecRef = useRef<number | null>(null);
   const prevIsMyTurnRef = useRef<boolean | null>(null);
   const prevTimeUpRef = useRef<boolean>(false);
+  const [toastText, setToastText] = useState<string | null>(null);
 
   const isMyTurn = game?.currentTurn === userId;
   const latestQ = game?.questions?.[0] ?? null;
@@ -60,11 +62,20 @@ export function GameScreen({
     return () => clearTimeout(t);
   }, [reaction]);
 
-  const reactionText = useMemo(() => {
-    if (reaction) return `تم إرسال ${reaction}`;
-    if (lastReaction?.emoji && lastReaction?.fromName) return `${lastReaction.fromName} ${lastReaction.emoji}`;
-    return null;
-  }, [lastReaction?.emoji, lastReaction?.fromName, reaction]);
+  useEffect(() => {
+    const txt =
+      reaction != null
+        ? `تم إرسال ${reaction}`
+        : lastToast?.text
+          ? String(lastToast.text)
+          : lastReaction?.emoji && lastReaction?.fromName
+            ? `${lastReaction.fromName} ${lastReaction.emoji}`
+            : null;
+    if (!txt) return;
+    setToastText(txt);
+    const t = setTimeout(() => setToastText(null), 1600);
+    return () => clearTimeout(t);
+  }, [lastReaction?.emoji, lastReaction?.fromName, lastToast?.text, reaction]);
 
   useEffect(() => {
     const prev = prevIsMyTurnRef.current;
@@ -127,7 +138,20 @@ export function GameScreen({
             img.setAttribute('data-rn-orig-src', img.getAttribute('src') || '');
             img.setAttribute('data-rn-orig-class', img.className || '');
           }
-          if (offline && !isMyTurn && typeof p.botImageUri === 'string') {
+          if (!offline && typeof p.opponentImageUri === 'string' && p.opponentImageUri) {
+            if (img) {
+              img.setAttribute('src', p.opponentImageUri);
+              img.className = (img.getAttribute('data-rn-orig-class') || '').replace(/blur-3xl/g, '').replace(/opacity-60/g, 'opacity-95');
+              img.style.filter = 'brightness(0.55) contrast(1.15) saturate(1.05)';
+            }
+            if (helpIcon) helpIcon.style.display = 'none';
+            if (title && !answerMode) title.textContent = (typeof p.opponentName === 'string' && p.opponentName) ? ('خصمك: ' + p.opponentName) : 'خصمك';
+            if (sub && !answerMode) sub.textContent = isMyTurn ? 'إسأل عشان تعرف نفسك' : 'جاوب على سؤاله';
+            try {
+              if (title) title.style.textShadow = '0 6px 18px rgba(0,0,0,0.75)';
+              if (sub) sub.style.textShadow = '0 6px 18px rgba(0,0,0,0.75)';
+            } catch (e) {}
+          } else if (offline && !isMyTurn && typeof p.botImageUri === 'string') {
             if (img) {
               img.setAttribute('src', p.botImageUri);
               img.className = (img.getAttribute('data-rn-orig-class') || '').replace(/blur-3xl/g, '').replace(/opacity-60/g, 'opacity-95');
@@ -276,8 +300,8 @@ export function GameScreen({
             toast.style.display = 'none';
             document.body.appendChild(toast);
           }
-          if (p.reactionText) {
-            toast.textContent = String(p.reactionText);
+          if (p.toastText) {
+            toast.textContent = String(p.toastText);
             toast.style.display = 'block';
           } else {
             toast.style.display = 'none';
@@ -395,6 +419,13 @@ true;
   const roundText =
     offline && offlineState?.round && offlineState?.maxRounds ? `Round ${offlineState.round}/${offlineState.maxRounds}` : null;
 
+  const opponent = useMemo(() => {
+    const ps = Array.isArray((game as any)?.players) ? (game as any).players : [];
+    return ps.find((p: any) => String(p?.id ?? '') && String(p.id) !== String(userId)) ?? null;
+  }, [game, userId]);
+  const opponentImageUri = !offline ? (String(opponent?.card?.imageUri ?? '').trim() || null) : null;
+  const opponentName = !offline ? (String(opponent?.name ?? '').trim() || null) : null;
+
   useEffect(() => {
     if (remainingSec === null) return;
     if (remainingSec === lastTickSecRef.current) return;
@@ -426,7 +457,9 @@ true;
         guessWrong: Boolean(offlineState?.lastGuessCorrect === false),
         botImageUri: offlineState?.botCard?.imageUri ?? null,
         activeQuestionText: typeof latestQ?.text === 'string' ? latestQ.text : null,
-        reactionText,
+        opponentImageUri,
+        opponentName,
+        toastText,
         timerText,
         roundText
       }}
