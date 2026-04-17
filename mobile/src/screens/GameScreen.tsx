@@ -55,6 +55,8 @@ export function GameScreen({
   const questionOpen =
     Boolean(latestQuestion?.id) && latestAnswers ? Object.values(latestAnswers).some((v: any) => v == null) : false;
   const isAiTurn = offline && !isMyTurn && String(latestQ?.askedBy ?? '') === 'bot_ai_1';
+  const questionsCount = Array.isArray((game as any)?.questions) ? (game as any).questions.length : 0;
+  const canGuess = offline ? true : isMyTurn && questionsCount >= 3;
 
   useEffect(() => {
     if (!reaction) return;
@@ -277,7 +279,11 @@ export function GameScreen({
             }
 
             if (inputSection) inputSection.style.display = isMyTurn ? '' : 'none';
-            if (guessBtn) guessBtn.style.display = isMyTurn ? '' : 'none';
+            if (guessBtn) {
+              guessBtn.style.display = isMyTurn ? '' : 'none';
+              guessBtn.disabled = !Boolean(p.canGuess);
+              guessBtn.style.opacity = Boolean(p.canGuess) ? '1' : '0.55';
+            }
           }
         } catch (e) {}
 
@@ -395,6 +401,11 @@ true;
       }
 
       if (clickText.includes('أنا فاكر إني')) {
+        if (!canGuess) {
+          const remaining = Math.max(0, 3 - questionsCount);
+          Alert.alert('لا يمكن التخمين الآن', `لازم تسأل ${remaining} سؤال قبل التخمين.`);
+          return;
+        }
         onOpenGuessPicker?.();
         return;
       }
@@ -408,7 +419,7 @@ true;
         }
       }
     },
-    [isAiTurn, isMyTurn, latestQ?.id, myNeedAnswer, offline, onGoHome, onGoProfile, onGoScoreboard, onOpenGuessPicker, question]
+    [canGuess, isAiTurn, isMyTurn, latestQ?.id, myNeedAnswer, offline, onGoHome, onGoProfile, onGoScoreboard, onOpenGuessPicker, question, questionsCount]
   );
 
   const endsAt = typeof game?.timer?.turnEndsAt === 'number' ? game.timer.turnEndsAt : null;
@@ -452,6 +463,7 @@ true;
         answerMode,
         questionOpen,
         questionText: typeof (latestQuestion as any)?.text === 'string' ? String((latestQuestion as any).text) : null,
+        canGuess,
         waitingAi: Boolean(offlineState?.waiting),
         aiAnswer: offlineState?.lastAnswer ?? null,
         guessWrong: Boolean(offlineState?.lastGuessCorrect === false),
