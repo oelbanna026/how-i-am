@@ -536,6 +536,10 @@ class RoomManager {
       scores: Object.fromEntries(Array.from(room.players.values()).map((x) => [x.id, x.score]))
     });
 
+    if (complete) {
+      this.advanceTurn(room);
+    }
+
     return { yesCount, noCount, complete, majority };
   }
 
@@ -561,10 +565,13 @@ class RoomManager {
       p.score += SCORE_CORRECT_GUESS;
       room.game.guessesThisTurnByPlayerId.set(playerId, used + 1);
       room.game.winnerId = playerId;
+      const targetCard = target ?? null;
       this.emit(room.code, 'guessResult', {
         roomCode: room.code,
         playerId,
+        guess: String(guess ?? '').trim().slice(0, 64),
         correct: true,
+        target: targetCard ? { name: String(targetCard.name ?? ''), imagePath: String(targetCard.imagePath ?? '') } : null,
         penalty: null,
         scoreDelta: SCORE_CORRECT_GUESS,
         scores: Object.fromEntries(Array.from(room.players.values()).map((x) => [x.id, x.score]))
@@ -581,6 +588,7 @@ class RoomManager {
     this.emit(room.code, 'guessResult', {
       roomCode: room.code,
       playerId,
+      guess: String(guess ?? '').trim().slice(0, 64),
       correct: false,
       penalty: { skipTurns: 1 },
       scoreDelta: SCORE_WRONG_GUESS,
