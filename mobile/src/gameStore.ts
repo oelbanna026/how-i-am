@@ -117,9 +117,26 @@ function normalizeCardForClient(serverUrl: string, card: any) {
 }
 
 async function loadServerUrl() {
+  const fromEnv = String((process.env.EXPO_PUBLIC_SERVER_URL as string | undefined) ?? '').trim();
+  if (fromEnv) return fromEnv;
   const raw = await AsyncStorage.getItem(SERVER_URL_KEY);
   const val = String(raw ?? '').trim();
-  if (val) return val;
+  if (val) {
+    const lower = val.toLowerCase();
+    const isLocal =
+      lower.includes('localhost') ||
+      lower.includes('127.0.0.1') ||
+      lower.startsWith('http://192.') ||
+      lower.startsWith('http://10.') ||
+      lower.startsWith('http://172.16.') ||
+      lower.startsWith('http://172.17.') ||
+      lower.startsWith('http://172.18.') ||
+      lower.startsWith('http://172.19.') ||
+      lower.startsWith('http://172.2') ||
+      lower.startsWith('http://172.30.') ||
+      lower.startsWith('http://172.31.');
+    if (!isLocal) return val;
+  }
   return defaultServerUrl();
 }
 
