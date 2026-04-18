@@ -150,10 +150,13 @@ class RoomManager {
 
     const game = room.game;
     return {
+      id: room.code,
       roomCode: room.code,
       roomName: room.roomName ?? null,
       maxPlayers: room.maxPlayers ?? MAX_PLAYERS,
       flow: room.flow,
+      status: room.flow,
+      type: room.isPublic ? 'public' : 'private',
       hostId: room.hostId,
       players,
       mode: room.mode,
@@ -204,11 +207,14 @@ class RoomManager {
     const myCard = Boolean(revealSelf) ? game.cardsByPlayerId.get(viewerId) ?? null : null;
 
     return {
+      id: room.code,
       roomCode: room.code,
       flow: room.flow,
       phase: game.phase ?? 'playing',
       mode: room.mode,
       category: room.category,
+      type: room.isPublic ? 'public' : 'private',
+      status: room.flow,
       rounds: game.roundsTotal ?? ROUNDS_TOTAL,
       currentRound: game.currentRound ?? 1,
       currentTurn: game.currentTurnPlayerId,
