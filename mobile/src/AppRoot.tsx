@@ -45,14 +45,22 @@ const navRef = createNavigationContainerRef<RootStackParamList>();
 export function AppRoot() {
   const roundResult = useGameStore((s) => s.roundResult);
   const game = useGameStore((s) => s.gameState);
+  const serverUrl = useGameStore((s) => s.serverUrl);
 
   useEffect(() => {
     const buildId = (process.env.EXPO_PUBLIC_BUILD_ID as string | undefined) ?? 'dev';
-    console.log('[APP_BOOT]', { buildId, serverEnv: process.env.EXPO_PUBLIC_SERVER_URL });
+    const raw = String((process.env.EXPO_PUBLIC_SERVER_URL as string | undefined) ?? '');
+    const sanitized = raw.trim().replace(/\s+/g, '').replace(/^`+/, '').replace(/`+$/, '');
+    console.log('[APP_BOOT]', { buildId, serverEnv: raw, serverEnvSanitized: sanitized });
     void gameActions.connectSocket().catch(() => null);
     void audioService.init().catch(() => null);
     void voiceService.init().catch(() => null);
   }, []);
+
+  useEffect(() => {
+    if (!serverUrl) return;
+    console.log('[SERVER_URL]', { serverUrl });
+  }, [serverUrl]);
 
   const syncMusicToRoute = () => {
     if (!navRef.isReady()) return;
