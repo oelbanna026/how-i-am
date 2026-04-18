@@ -874,6 +874,19 @@ async function main() {
       }
     });
 
+    socket.on('listRooms', async (payload, ack) => {
+      try {
+        const limitRaw = payload?.limit;
+        const limit = Number.isFinite(Number(limitRaw)) ? Math.max(1, Math.min(50, Math.floor(Number(limitRaw)))) : 50;
+        const rooms = await listPublicRooms(redis);
+        const out = rooms.slice(0, limit);
+        socket.emit('roomsList', { rooms: out });
+        if (typeof ack === 'function') ack({ ok: true, rooms: out });
+      } catch (e) {
+        if (typeof ack === 'function') ack({ ok: false, error: String(e?.message ?? e) });
+      }
+    });
+
     socket.on('useHint', async (_payload, ack) => {
       try {
         const { code, userId } = requireInRoom();
