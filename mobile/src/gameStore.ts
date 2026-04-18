@@ -93,7 +93,7 @@ function guessDevHost() {
 }
 
 function defaultServerUrl() {
-  const fromEnv = (process.env.EXPO_PUBLIC_SERVER_URL as string | undefined) ?? '';
+  const fromEnv = normalizeServerUrlInput((process.env.EXPO_PUBLIC_SERVER_URL as string | undefined) ?? '');
   if (fromEnv) return fromEnv;
   const host = guessDevHost();
   if (host) return `http://${host}:3002`;
@@ -118,15 +118,26 @@ function normalizeCardForClient(serverUrl: string, card: any) {
 
 function normalizeServerUrlInput(raw: string) {
   const s = String(raw ?? '');
-  const m = s.match(/(https?:\/\/[^\s`"'<>]+)/i);
-  const picked = m ? m[1] : s;
-  const cleaned = String(picked)
-    .trim()
-    .replace(/^[`"'“”‘’]+/, '')
-    .replace(/[`"'“”‘’]+$/, '')
-    .replace(/\s+/g, '');
-  if (/^https?:\/\//i.test(cleaned)) return cleaned;
-  return '';
+  const idx = s.toLowerCase().indexOf('http://');
+  const idx2 = s.toLowerCase().indexOf('https://');
+  const start = idx === -1 ? idx2 : idx2 === -1 ? idx : Math.min(idx, idx2);
+  if (start === -1) return '';
+
+  const urlChars = /[a-z0-9\-._~:/?#\[\]@!$&'()*+,;=%]/i;
+  let out = '';
+  for (let i = start; i < s.length; i += 1) {
+    const ch = s[i];
+    if (!urlChars.test(ch)) break;
+    out += ch;
+  }
+  const candidate = out.trim();
+  if (!/^https?:\/\//i.test(candidate)) return '';
+  try {
+    const u = new URL(candidate);
+    return u.origin + u.pathname.replace(/\/+$/, '');
+  } catch {
+    return '';
+  }
 }
 
 async function loadServerUrl() {
