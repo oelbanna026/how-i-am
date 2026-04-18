@@ -116,8 +116,18 @@ function normalizeCardForClient(serverUrl: string, card: any) {
   return { ...card, imageUri };
 }
 
+function normalizeServerUrlInput(raw: string) {
+  let s = String(raw ?? '').trim();
+  s = s.replace(/\s+/g, '');
+  s = s.replace(/^`+/, '').replace(/`+$/, '');
+  s = s.replace(/^"+/, '').replace(/"+$/, '');
+  s = s.replace(/^'+/, '').replace(/'+$/, '');
+  s = s.trim();
+  return s;
+}
+
 async function loadServerUrl() {
-  const fromEnv = String((process.env.EXPO_PUBLIC_SERVER_URL as string | undefined) ?? '').trim();
+  const fromEnv = normalizeServerUrlInput((process.env.EXPO_PUBLIC_SERVER_URL as string | undefined) ?? '');
   if (fromEnv) return fromEnv;
   const raw = await AsyncStorage.getItem(SERVER_URL_KEY);
   const val = String(raw ?? '').trim();
