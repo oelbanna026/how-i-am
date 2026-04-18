@@ -117,13 +117,16 @@ function normalizeCardForClient(serverUrl: string, card: any) {
 }
 
 function normalizeServerUrlInput(raw: string) {
-  let s = String(raw ?? '').trim();
-  s = s.replace(/\s+/g, '');
-  s = s.replace(/^`+/, '').replace(/`+$/, '');
-  s = s.replace(/^"+/, '').replace(/"+$/, '');
-  s = s.replace(/^'+/, '').replace(/'+$/, '');
-  s = s.trim();
-  return s;
+  const s = String(raw ?? '');
+  const m = s.match(/(https?:\/\/[^\s`"'<>]+)/i);
+  const picked = m ? m[1] : s;
+  const cleaned = String(picked)
+    .trim()
+    .replace(/^[`"'“”‘’]+/, '')
+    .replace(/[`"'“”‘’]+$/, '')
+    .replace(/\s+/g, '');
+  if (/^https?:\/\//i.test(cleaned)) return cleaned;
+  return '';
 }
 
 async function loadServerUrl() {

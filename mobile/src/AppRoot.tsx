@@ -50,7 +50,13 @@ export function AppRoot() {
   useEffect(() => {
     const buildId = (process.env.EXPO_PUBLIC_BUILD_ID as string | undefined) ?? 'dev';
     const raw = String((process.env.EXPO_PUBLIC_SERVER_URL as string | undefined) ?? '');
-    const sanitized = raw.trim().replace(/\s+/g, '').replace(/^`+/, '').replace(/`+$/, '');
+    const m = raw.match(/(https?:\/\/[^\s`"'<>]+)/i);
+    const picked = m ? m[1] : raw;
+    const sanitized = String(picked)
+      .trim()
+      .replace(/^[`"'“”‘’]+/, '')
+      .replace(/[`"'“”‘’]+$/, '')
+      .replace(/\s+/g, '');
     console.log('[APP_BOOT]', { buildId, serverEnv: raw, serverEnvSanitized: sanitized });
     void gameActions.connectSocket().catch(() => null);
     void audioService.init().catch(() => null);
