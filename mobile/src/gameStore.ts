@@ -165,7 +165,10 @@ async function loadServerUrl() {
 }
 
 async function saveServerUrl(url: string) {
-  await AsyncStorage.setItem(SERVER_URL_KEY, String(url ?? '').trim());
+  const raw = String(url ?? '').trim();
+  const normalized = normalizeServerUrlInput(raw);
+  const next = normalized || raw;
+  await AsyncStorage.setItem(SERVER_URL_KEY, next);
 }
 
 async function ensureClientId() {
@@ -669,14 +672,22 @@ export function useGameStore<T>(selector: (s: GameStoreState) => T) {
 
 export const gameActions = {
   async setServerUrl(url: string) {
-    const next = String(url ?? '').trim();
+    const raw = String(url ?? '').trim();
+    const normalized = normalizeServerUrlInput(raw);
+    const next = normalized || raw;
     store.setState({ serverUrl: next });
     await saveServerUrl(next);
   },
 
   async connectSocket() {
-    const url = store.getState().serverUrl || (await loadServerUrl());
-    if (!store.getState().serverUrl) store.setState({ serverUrl: url });
+    let url = store.getState().serverUrl || (await loadServerUrl());
+    if (String(url).includes('how-i-am.onrender.com')) url = 'https://how-i-am.onrender.com';
+    const normalized = normalizeServerUrlInput(url);
+    if (normalized) url = normalized;
+    if (!store.getState().serverUrl || store.getState().serverUrl !== url) {
+      store.setState({ serverUrl: url });
+      await saveServerUrl(url);
+    }
     store.setState({ connecting: true, error: null });
     try {
       const userId = await ensureClientId();
