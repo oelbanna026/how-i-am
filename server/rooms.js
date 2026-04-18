@@ -1,16 +1,16 @@
 const { nanoid } = require('nanoid');
 const { getCards } = require('./cardsCache');
 
-const MAX_PLAYERS = 12;
+const MAX_PLAYERS = 2;
 const TURN_MS = 60000;
 const MIN_QUESTIONS_BEFORE_GUESS = 3;
-const MAX_ROUNDS = 10;
+const ROUNDS_TOTAL = 3;
 const RECONNECT_GRACE_MS = 30000;
 const MAX_GUESSES_PER_TURN = 1;
 
-const SCORE_CORRECT_GUESS = 30;
-const SCORE_CORRECT_DEDUCTION = 10;
-const SCORE_WRONG_GUESS = -10;
+const SCORE_CORRECT_GUESS = 10;
+const SCORE_CORRECT_DEDUCTION = 1;
+const SCORE_WRONG_GUESS = 0;
 
 function normalizeRoomCategory(raw) {
   const t = String(raw ?? '').trim().toLowerCase();
@@ -47,6 +47,22 @@ function pickUniqueCards(categoryRaw, count) {
 
 function nowMs() {
   return Date.now();
+}
+
+function computeGuessBonus(turnEndsAt) {
+  const remainingMs = Math.max(0, Number(turnEndsAt ?? 0) - nowMs());
+  const remainingSec = remainingMs / 1000;
+  return Math.max(0, Math.min(10, Math.floor(remainingSec / 10)));
+}
+
+function assignRoundCards(room, order) {
+  const cards = pickUniqueCards(room.category, order.length);
+  if (!cards.length) throw new Error('NOT_ENOUGH_CARDS');
+  const cardsByPlayerId = new Map();
+  for (let i = 0; i < order.length; i += 1) {
+    cardsByPlayerId.set(order[i], cards[i]);
+  }
+  return cardsByPlayerId;
 }
 
 function createRoomCode() {
@@ -143,6 +159,9 @@ class RoomManager {
       mode: room.mode,
       category: room.category,
       isPublic: typeof room.isPublic === 'boolean' ? room.isPublic : true,
+      rounds: game?.roundsTotal ?? ROUNDS_TOTAL,
+      currentRound: game?.currentRound ?? null,
+      phase: game?.phase ?? null,
       currentTurn: game?.currentTurnPlayerId ?? null,
       timer: game
         ? { turnEndsAt: game.turnEndsAt, turnMs: game.turnMs }
@@ -187,8 +206,11 @@ class RoomManager {
     return {
       roomCode: room.code,
       flow: room.flow,
+      phase: game.phase ?? 'playing',
       mode: room.mode,
       category: room.category,
+      rounds: game.roundsTotal ?? ROUNDS_TOTAL,
+      currentRound: game.currentRound ?? 1,
       currentTurn: game.currentTurnPlayerId,
       timer: { turnEndsAt: game.turnEndsAt, turnMs: game.turnMs },
       winnerId: game.winnerId,
@@ -201,16 +223,12 @@ class RoomManager {
 
   createRoom({ host, mode, category, roomName, maxPlayers, turnMs, maxRounds, isPublic }) {
     const code = this.ensureUniqueRoomCode();
-    const mp = Number.isFinite(Number(maxPlayers))
-      ? Math.max(2, Math.min(MAX_PLAYERS, Math.floor(Number(maxPlayers))))
-      : MAX_PLAYERS;
+    const mp = 2;
     const cfg = modeConfig(mode || 'Classic');
     const tm = Number.isFinite(Number(turnMs))
       ? Math.max(10000, Math.min(120000, Math.floor(Number(turnMs))))
       : cfg.turnMs;
-    const mr = Number.isFinite(Number(maxRounds))
-      ? Math.max(3, Math.min(20, Math.floor(Number(maxRounds))))
-      : MAX_ROUNDS;
+    const mr = ROUNDS_TOTAL;
     const room = {
       code,
       maxPlayers: mp,
@@ -283,7 +301,7 @@ class RoomManager {
     if (room.game && room.flow === 'playing') {
       const remaining = Array.from(room.players.keys());
       if (remaining.length === 1) {
-        this.endGame(room, remaining[0]);
+        this.endGame(room, remaining[0], { reason: 'SURRENDER' });
       }
     }
   }
@@ -363,17 +381,16 @@ class RoomManager {
 
     const base = modeConfig(room.mode || 'Classic');
     const turnMs = room.settings?.turnMs ?? base.turnMs ?? TURN_MS;
-    const cards = pickUniqueCards(room.category, order.length);
-    if (!cards.length) throw new Error('NOT_ENOUGH_CARDS');
-    const cardsByPlayerId = new Map();
-    for (let i = 0; i < order.length; i += 1) {
-      cardsByPlayerId.set(order[i], cards[i]);
-    }
+    const cardsByPlayerId = assignRoundCards(room, order);
 
     room.game = {
-      flow: 'playing',
+      phase: 'playing',
       startedAt: nowMs(),
       endedAt: null,
+      roundsTotal: ROUNDS_TOTAL,
+      currentRound: 1,
+      roundStartedAt: nowMs(),
+      roundEndedAt: null,
       turnMs,
       currentTurnPlayerId: order[0],
       turnEndsAt: nowMs() + turnMs,
@@ -386,7 +403,8 @@ class RoomManager {
       skipsByPlayerId: new Map(),
       guessesThisTurnByPlayerId: new Map(),
       turnsTaken: 0,
-      maxTurns: (room.settings?.maxRounds ?? MAX_ROUNDS) * order.length
+      maxTurns: ROUNDS_TOTAL * order.length * 4,
+      roundResults: []
     };
     room.game.guessesThisTurnByPlayerId.set(room.game.currentTurnPlayerId, 0);
 
@@ -402,6 +420,7 @@ class RoomManager {
       if (!room.game) return;
       if (room.flow !== 'playing') return;
       if (room.game.winnerId) return;
+      if (room.game.phase !== 'playing') return;
       if (nowMs() < room.game.turnEndsAt) return;
       this.advanceTurn(room);
     }, 250);
@@ -410,12 +429,13 @@ class RoomManager {
   advanceTurn(room) {
     const game = room.game;
     if (!game) return;
+    if (game.phase !== 'playing') return;
     const ids = game.order.filter((id) => room.players.has(id));
     if (!ids.length) return;
 
     game.turnsTaken += 1;
     if (game.turnsTaken >= game.maxTurns) {
-      this.endGame(room, null, { reason: 'MAX_ROUNDS' });
+      this.endGame(room, null, { reason: 'MAX_TURNS' });
       return;
     }
 
@@ -446,6 +466,7 @@ class RoomManager {
     const room = this.rooms.get(code);
     if (!room || !room.game) throw new Error('ROOM_NOT_FOUND');
     if (room.flow !== 'playing') throw new Error('GAME_NOT_PLAYING');
+    if (room.game.phase !== 'playing') throw new Error('ROUND_NOT_PLAYING');
     if (playerId !== room.game.currentTurnPlayerId) throw new Error('NOT_YOUR_TURN');
     if (room.game.openQuestionId) throw new Error('QUESTION_ALREADY_OPEN');
 
@@ -491,6 +512,7 @@ class RoomManager {
     const room = this.rooms.get(code);
     if (!room || !room.game) throw new Error('ROOM_NOT_FOUND');
     if (room.flow !== 'playing') throw new Error('GAME_NOT_PLAYING');
+    if (room.game.phase !== 'playing') throw new Error('ROUND_NOT_PLAYING');
 
     const game = room.game;
     if (!questionId || questionId !== game.openQuestionId) throw new Error('QUESTION_NOT_OPEN');
@@ -549,6 +571,7 @@ class RoomManager {
     if (!room || !room.game) throw new Error('ROOM_NOT_FOUND');
     if (room.flow !== 'playing') throw new Error('GAME_NOT_PLAYING');
     if (room.game.winnerId) throw new Error('GAME_ENDED');
+    if (room.game.phase !== 'playing') throw new Error('ROUND_NOT_PLAYING');
     if (playerId !== room.game.currentTurnPlayerId) throw new Error('NOT_YOUR_TURN');
     if (room.game.hintsUsedByPlayerId?.has(playerId)) throw new Error('HINT_ALREADY_USED');
 
@@ -566,11 +589,72 @@ class RoomManager {
     return { type, value };
   }
 
+  endRound(room, winnerId, { reason, card, scoreDelta } = {}) {
+    const game = room.game;
+    if (!game) return;
+    if (game.phase !== 'playing') return;
+    game.phase = 'round_result';
+    game.roundEndedAt = nowMs();
+
+    const p = winnerId ? room.players.get(winnerId) : null;
+    const winnerName = p?.name ?? null;
+    const payload = {
+      roomCode: room.code,
+      round: game.currentRound ?? 1,
+      rounds: game.roundsTotal ?? ROUNDS_TOTAL,
+      reason: reason ?? 'UNKNOWN',
+      winnerId: winnerId ?? null,
+      winnerName,
+      correctAnswer: card ? { name: String(card.name ?? ''), imagePath: String(card.imagePath ?? '') } : null,
+      pointsEarned: Number(scoreDelta ?? 0),
+      scores: Object.fromEntries(Array.from(room.players.values()).map((x) => [x.id, x.score]))
+    };
+    game.roundResults = Array.isArray(game.roundResults) ? [...game.roundResults, payload] : [payload];
+    this.emit(room.code, 'roundResult', payload);
+
+    const nextRound = (game.currentRound ?? 1) + 1;
+    if (nextRound > (game.roundsTotal ?? ROUNDS_TOTAL)) {
+      const finalWinner =
+        Array.from(room.players.values())
+          .sort((a, b) => (b.score !== a.score ? b.score - a.score : a.joinedAt - b.joinedAt))[0]?.id ?? null;
+      this.endGame(room, finalWinner, { reason: 'FINAL_RESULT' });
+      return;
+    }
+
+    setTimeout(() => {
+      try {
+        if (!room.game) return;
+        if (room.flow !== 'playing') return;
+        if (room.game.winnerId) return;
+
+        room.game.currentRound = nextRound;
+        room.game.phase = 'playing';
+        room.game.roundStartedAt = nowMs();
+        room.game.roundEndedAt = null;
+        room.game.questions = [];
+        room.game.openQuestionId = null;
+        room.game.hintsUsedByPlayerId = new Set();
+        room.game.skipsByPlayerId = new Map();
+        room.game.guessesThisTurnByPlayerId = new Map();
+
+        const order = Array.isArray(room.game.order) ? room.game.order : Array.from(room.players.keys());
+        room.game.cardsByPlayerId = assignRoundCards(room, order);
+
+        const startIdx = (nextRound - 1) % order.length;
+        room.game.currentTurnPlayerId = order[startIdx] ?? order[0];
+        room.game.turnEndsAt = nowMs() + room.game.turnMs;
+        room.game.guessesThisTurnByPlayerId.set(room.game.currentTurnPlayerId, 0);
+        this.emit(room.code, 'turnUpdate', { currentTurn: room.game.currentTurnPlayerId, timer: { turnEndsAt: room.game.turnEndsAt, turnMs: room.game.turnMs } });
+      } catch {}
+    }, 2500);
+  }
+
   makeGuess({ code, playerId, guess }) {
     const room = this.rooms.get(code);
     if (!room || !room.game) throw new Error('ROOM_NOT_FOUND');
     if (room.flow !== 'playing') throw new Error('GAME_NOT_PLAYING');
     if (room.game.winnerId) throw new Error('GAME_ENDED');
+    if (room.game.phase !== 'playing') throw new Error('ROUND_NOT_PLAYING');
     if (room.game.questions.length < MIN_QUESTIONS_BEFORE_GUESS) throw new Error('NEED_MORE_QUESTIONS');
     if (playerId !== room.game.currentTurnPlayerId) throw new Error('NOT_YOUR_TURN');
 
@@ -585,9 +669,10 @@ class RoomManager {
     if (!p) throw new Error('PLAYER_NOT_IN_ROOM');
 
     if (correct) {
-      p.score += SCORE_CORRECT_GUESS;
+      const bonus = computeGuessBonus(room.game.turnEndsAt);
+      const delta = SCORE_CORRECT_GUESS + bonus;
+      p.score += delta;
       room.game.guessesThisTurnByPlayerId.set(playerId, used + 1);
-      room.game.winnerId = playerId;
       const targetCard = target ?? null;
       this.emit(room.code, 'guessResult', {
         roomCode: room.code,
@@ -596,10 +681,10 @@ class RoomManager {
         correct: true,
         target: targetCard ? { name: String(targetCard.name ?? ''), imagePath: String(targetCard.imagePath ?? '') } : null,
         penalty: null,
-        scoreDelta: SCORE_CORRECT_GUESS,
+        scoreDelta: delta,
         scores: Object.fromEntries(Array.from(room.players.values()).map((x) => [x.id, x.score]))
       });
-      this.endGame(room, playerId, { reason: 'CORRECT_GUESS' });
+      this.endRound(room, playerId, { reason: 'CORRECT_GUESS', card: targetCard, scoreDelta: delta });
       return { correct: true };
     }
 
@@ -633,6 +718,7 @@ class RoomManager {
 
     game.winnerId = winner;
     game.endedAt = nowMs();
+    game.phase = 'final_result';
     room.flow = 'ended';
     if (room.timer) clearInterval(room.timer);
     room.timer = null;

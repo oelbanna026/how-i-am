@@ -39,7 +39,19 @@ async function main() {
       realtime: 'socket.io'
     })
   );
-  app.get('/health', (_req, res) => res.json({ ok: true }));
+  app.get('/health', (_req, res) =>
+    res.json({
+      ok: true,
+      name: 'who-am-i-online-server',
+      git: process.env.RENDER_GIT_COMMIT ?? process.env.GIT_COMMIT ?? null
+    })
+  );
+  app.get('/version', (_req, res) =>
+    res.json({
+      ok: true,
+      git: process.env.RENDER_GIT_COMMIT ?? process.env.GIT_COMMIT ?? null
+    })
+  );
   app.get('/categories', (_req, res) => res.json({ categories: Array.from(VALID_CATEGORIES) }));
 
   app.use('/assets', express.static(path.join(__dirname, 'assets')));
@@ -66,6 +78,8 @@ async function main() {
       if (event === 'questionReceived') io.to(code).emit('questionReceived', payload);
       if (event === 'answerResult') io.to(code).emit('answerResult', payload);
       if (event === 'guessResult') io.to(code).emit('guessResult', payload);
+      if (event === 'hintUsed') io.to(code).emit('hintUsed', payload);
+      if (event === 'roundResult') io.to(code).emit('roundResult', payload);
       if (event === 'gameStart') {
         emitRoomUpdate(code).catch(() => null);
         emitGameStart(code).catch(() => null);
@@ -376,6 +390,46 @@ async function main() {
     }
   });
 
+  app.post('/rooms/create', async (req, res) => {
+    try {
+      const userId = String(req.body?.userId ?? '').trim() || `u_${nanoid(10)}`;
+      const name = String(req.body?.name ?? 'Guest').trim();
+      const mode = String(req.body?.mode ?? 'Classic').trim();
+      const category = String(req.body?.category ?? 'All').trim();
+      const isPublic = Boolean(req.body?.type ? String(req.body.type).toLowerCase() === 'public' : req.body?.isPublic ?? true);
+      const created = roomManager.createRoom({
+        host: { id: userId, name },
+        mode,
+        category,
+        roomName: req.body?.roomName ?? null,
+        maxPlayers: 2,
+        turnMs: 60000,
+        maxRounds: 3,
+        isPublic
+      });
+      await emitRoomUpdate(created.room.code);
+      return res.json({ ok: true, roomCode: created.room.code, sessionToken: created.sessionToken });
+    } catch (e) {
+      return res.status(400).json({ ok: false, error: String(e?.message ?? e) });
+    }
+  });
+
+  app.post('/rooms/join', async (req, res) => {
+    try {
+      const code = String(req.body?.code ?? req.body?.roomCode ?? '').trim().toUpperCase();
+      const userId = String(req.body?.userId ?? '').trim();
+      const name = String(req.body?.name ?? 'Guest').trim();
+      const sessionToken = String(req.body?.sessionToken ?? '').trim();
+      if (!code) return res.status(400).json({ ok: false, error: 'MISSING_CODE' });
+      if (!userId) return res.status(400).json({ ok: false, error: 'MISSING_USER_ID' });
+      const join = roomManager.joinRoom({ code, player: { id: userId, name, sessionToken: sessionToken || null } });
+      await emitRoomUpdate(code);
+      return res.json({ ok: true, roomCode: code, sessionToken: join.sessionToken, reconnected: join.reconnected });
+    } catch (e) {
+      return res.status(400).json({ ok: false, error: String(e?.message ?? e) });
+    }
+  });
+
   app.get('/leaderboard', async (_req, res) => {
     try {
       const rows = await GameRecord.aggregate([
@@ -670,6 +724,19 @@ async function main() {
         }
         socket.data.userId = null;
         socket.data.sessionToken = null;
+        if (typeof ack === 'function') ack({ ok: true });
+      } catch (e) {
+        if (typeof ack === 'function') ack({ ok: false, error: String(e?.message ?? e) });
+      }
+    });
+
+    socket.on('surrender', async (ack) => {
+      try {
+        const code = socket.data.roomCode;
+        const userId = String(socket.data.userId ?? '').trim();
+        if (!code || !userId) throw new Error('NOT_IN_ROOM');
+        roomManager.leaveRoom({ code, playerId: userId });
+        await emitRoomUpdate(code);
         if (typeof ack === 'function') ack({ ok: true });
       } catch (e) {
         if (typeof ack === 'function') ack({ ok: false, error: String(e?.message ?? e) });
