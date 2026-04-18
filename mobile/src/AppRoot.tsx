@@ -47,6 +47,8 @@ export function AppRoot() {
   const game = useGameStore((s) => s.gameState);
 
   useEffect(() => {
+    const buildId = (process.env.EXPO_PUBLIC_BUILD_ID as string | undefined) ?? 'dev';
+    console.log('[APP_BOOT]', { buildId, serverEnv: process.env.EXPO_PUBLIC_SERVER_URL });
     void gameActions.connectSocket().catch(() => null);
     void audioService.init().catch(() => null);
     void voiceService.init().catch(() => null);
