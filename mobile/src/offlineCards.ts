@@ -1,16 +1,35 @@
 import { Asset } from 'expo-asset';
 import * as FileSystem from 'expo-file-system/legacy';
+import { normalizeCardCategory, normalizeCardImagePath } from './cardImages';
 
 export type OfflineCard = {
+  id: string;
   category: string;
   slug: string;
   name: string;
+  image: string;
   imagePath: string;
 };
 
 const offlineData = require('../assets/offline_cards/cards.import.json') as { cards?: OfflineCard[] };
 
-export const offlineCards: OfflineCard[] = Array.isArray(offlineData?.cards) ? offlineData.cards : [];
+export const offlineCards: OfflineCard[] = Array.isArray(offlineData?.cards)
+  ? offlineData.cards
+      .map((card, index) => {
+        const category = normalizeCardCategory(card?.category);
+        const slug = String(card?.slug ?? '').trim();
+        const imagePath = normalizeCardImagePath((card as any)?.imagePath ?? (card as any)?.image) ?? '';
+        return {
+          ...card,
+          id: String((card as any)?.id ?? `${category}:${slug || index}`),
+          category,
+          slug,
+          image: imagePath,
+          imagePath
+        };
+      })
+      .filter((card) => Boolean(card.imagePath))
+  : [];
 
 const imageModules: Record<string, number> = {
   '/assets/animals/animal_cat_01.png': require('../assets/offline_cards/animals/animal_cat_01.png'),
@@ -66,23 +85,71 @@ const imageModules: Record<string, number> = {
   '/assets/vegetables/vegetable_tomato_01.png': require('../assets/offline_cards/vegetables/vegetable_tomato_01.png')
 };
 
+const imageUriCache = new Map<string, Promise<string | null>>();
+const imageDataUriCache = new Map<string, Promise<string | null>>();
+
 export async function offlineImageUri(imagePath: string | null | undefined) {
-  const p = String(imagePath ?? '').trim();
+  const p = normalizeCardImagePath(imagePath);
   if (!p) return null;
+  if (/^(?:https?:|data:|file:|blob:)/i.test(p)) return p;
+  const cached = imageUriCache.get(p);
+  if (cached) return cached;
   const mod = imageModules[p];
   if (!mod) return null;
-  const asset = Asset.fromModule(mod);
-  await asset.downloadAsync();
-  return asset.localUri ?? asset.uri ?? null;
+  const loading = (async () => {
+    const asset = Asset.fromModule(mod);
+    await asset.downloadAsync();
+    return asset.localUri ?? asset.uri ?? null;
+  })();
+  imageUriCache.set(p, loading);
+  return loading;
 }
 
 export async function offlineImageDataUri(imagePath: string | null | undefined) {
-  const p = String(imagePath ?? '').trim();
+  const p = normalizeCardImagePath(imagePath);
   if (!p) return null;
-  const uri = await offlineImageUri(p);
-  if (!uri) return null;
-  if (!uri.startsWith('file:')) return null;
-  const base64 = await FileSystem.readAsStringAsync(uri, { encoding: (FileSystem as any).EncodingType?.Base64 ?? 'base64' });
-  const ext = p.toLowerCase().endsWith('.jpg') || p.toLowerCase().endsWith('.jpeg') ? 'jpeg' : 'png';
-  return `data:image/${ext};base64,${base64}`;
+  if (/^data:/i.test(p)) return p;
+  const cached = imageDataUriCache.get(p);
+  if (cached) return cached;
+  const loading = (async () => {
+    const uri = await offlineImageUri(p);
+    if (!uri) return null;
+    if (/^data:/i.test(uri)) return uri;
+    if (!uri.startsWith('file:')) return null;
+    const base64 = await FileSystem.readAsStringAsync(uri, {
+      encoding: (FileSystem as any).EncodingType?.Base64 ?? 'base64'
+    });
+    const ext = p.toLowerCase().endsWith('.jpg') || p.toLowerCase().endsWith('.jpeg') ? 'jpeg' : 'png';
+    return `data:image/${ext};base64,${base64}`;
+  })();
+  imageDataUriCache.set(p, loading);
+  return loading;
+}
+
+function shuffleCards<T>(cards: T[]) {
+  const next = cards.slice();
+  for (let i = next.length - 1; i > 0; i -= 1) {
+    const j = Math.floor(Math.random() * (i + 1));
+    const tmp = next[i];
+    next[i] = next[j];
+    next[j] = tmp;
+  }
+  return next;
+}
+
+export function getOfflineCardsForCategory(categoryRaw: string | null | undefined) {
+  const category = normalizeCardCategory(categoryRaw);
+  if (category === 'All') return offlineCards.slice();
+  return offlineCards.filter((card) => normalizeCardCategory(card.category) === category);
+}
+
+export function pickDistinctOfflineCards(categoryRaw: string | null | undefined) {
+  const pool = shuffleCards(getOfflineCardsForCategory(categoryRaw));
+  const userCard = pool[0] ?? null;
+  const botCard = pool.find((card) => String(card.slug) !== String(userCard?.slug ?? '')) ?? null;
+  return { userCard, botCard };
+}
+
+export async function preloadOfflineCardDataUris(cards: Array<{ imagePath?: string | null; image?: string | null } | null | undefined>) {
+  await Promise.all(cards.map((card) => offlineImageDataUri(card?.imagePath ?? card?.image ?? null)));
 }
