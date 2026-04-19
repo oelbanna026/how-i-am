@@ -1,4 +1,5 @@
-import React, { useCallback, useMemo } from 'react';
+import React, { useCallback, useEffect, useMemo } from 'react';
+import { CARD_PLACEHOLDER_DATA_URI, preloadImageUris, resolveCardImageUri } from '../cardImages';
 import { StitchHtmlScreen, type StitchWebEvent } from '../components/StitchHtmlScreen';
 import { useGameStore } from '../gameStore';
 import { stitchUiHtml } from '../stitchUiAssets';
@@ -6,25 +7,36 @@ import { stitchUiHtml } from '../stitchUiAssets';
 export function RoleRevealScreen({ onContinue }: { onContinue: () => void }) {
   const myCard = useGameStore((s) => s.myCard);
   const serverUrl = useGameStore((s) => s.serverUrl);
-  const room = useGameStore((s) => s.currentRoom);
-  const offline = String(room?.roomCode ?? '') === 'OFFLINE';
 
-  const imageUri = useMemo(() => {
-    if (offline) return null;
-    const direct = typeof (myCard as any)?.imageUri === 'string' ? String((myCard as any).imageUri) : '';
-    if (direct) return direct;
-    const base = String(serverUrl ?? '').replace(/\/+$/, '');
-    const p = typeof (myCard as any)?.imagePath === 'string' ? String((myCard as any).imagePath).trim() : '';
-    if (!base || !p) return null;
-    return `${base}${p.startsWith('/') ? '' : '/'}${p}`;
-  }, [myCard, offline, serverUrl]);
+  const imageUri = useMemo(() => resolveCardImageUri(serverUrl, myCard), [myCard, serverUrl]);
+
+  useEffect(() => {
+    void preloadImageUris([imageUri]).catch(() => null);
+  }, [imageUri]);
 
   const injected = useMemo(() => {
+    const placeholderImage = JSON.stringify(CARD_PLACEHOLDER_DATA_URI);
     return `
 (function () {
+  var PLACEHOLDER_IMAGE = ${placeholderImage};
   function onReady(fn) {
     if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', fn);
     else fn();
+  }
+  function loadImage(el, src) {
+    try {
+      if (!el) return;
+      var nextSrc = String(src || '').trim() || PLACEHOLDER_IMAGE;
+      el.setAttribute('src', PLACEHOLDER_IMAGE);
+      var probe = new Image();
+      probe.onload = function () {
+        try { el.setAttribute('src', nextSrc); } catch (e) {}
+      };
+      probe.onerror = function () {
+        try { el.setAttribute('src', PLACEHOLDER_IMAGE); } catch (e) {}
+      };
+      probe.src = nextSrc;
+    } catch (e) {}
   }
   onReady(function () {
     window.__RN_SYNC = function (payload) {
@@ -34,14 +46,8 @@ export function RoleRevealScreen({ onContinue }: { onContinue: () => void }) {
           var h = document.querySelector('main h3');
           if (h) h.innerHTML = String(p.name).split(' ').join('<br/>');
         }
-        if (typeof p.imageUri === 'string') {
-          var img = document.querySelector('main img[alt="Role Avatar"]');
-          if (img) img.setAttribute('src', p.imageUri);
-        }
-        if (p.imageUri === null) {
-          var img2 = document.querySelector('main img[alt="Role Avatar"]');
-          if (img2) img2.setAttribute('src', 'https://api.dicebear.com/9.x/thumbs/png?seed=hidden');
-        }
+        var img = document.querySelector('main img[alt="Role Avatar"]');
+        loadImage(img, typeof p.imageUri === 'string' ? p.imageUri : PLACEHOLDER_IMAGE);
       } catch (e) {}
     };
   });
@@ -53,7 +59,7 @@ true;
   const onEvent = useCallback(
     (e: StitchWebEvent) => {
       if (e.type !== 'click') return;
-      if (e.text.includes('أنا جاهز')) onContinue();
+      if (e.tag === 'button') onContinue();
     },
     [onContinue]
   );
@@ -63,7 +69,7 @@ true;
       htmlModule={stitchUiHtml.role_reveal_screen}
       onEvent={onEvent}
       injectedJavaScript={injected}
-      syncPayload={{ name: offline ? 'مخفي' : myCard?.name ?? '—', imageUri }}
+      syncPayload={{ name: myCard?.name ?? '-', imageUri }}
     />
   );
 }
