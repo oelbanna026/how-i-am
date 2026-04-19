@@ -1,5 +1,6 @@
 import React, { useCallback, useMemo, useState } from 'react';
 import { Alert } from 'react-native';
+import { CARD_PLACEHOLDER_DATA_URI } from '../cardImages';
 import { StitchHtmlScreen, type StitchWebEvent } from '../components/StitchHtmlScreen';
 import { gameActions, useGameStore } from '../gameStore';
 import { stitchUiHtml } from '../stitchUiAssets';
@@ -12,8 +13,10 @@ export function GuessPickerScreen({ onClose }: { onClose: () => void }) {
   const minQuestionsBeforeGuess = offline ? 0 : 3;
 
   const injected = useMemo(() => {
+    const placeholderImage = JSON.stringify(CARD_PLACEHOLDER_DATA_URI);
     return `
 (function () {
+  var PLACEHOLDER_IMAGE = ${placeholderImage};
   function onReady(fn) {
     if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', fn);
     else fn();
@@ -73,10 +76,10 @@ export function GuessPickerScreen({ onClose }: { onClose: () => void }) {
       html += '<div class="grid grid-cols-1 gap-3">';
       list.forEach(function (c) {
         var name = escapeHtml(String(c.name || ''));
-        var uri = escapeHtml(String(c.imageUri || ''));
+        var uri = escapeHtml(String(c.imageUri || '') || PLACEHOLDER_IMAGE);
         html += '<button data-stitch-tap="1" class="w-full flex items-center gap-4 p-4 rounded-2xl bg-surface-container/50 hover:bg-primary-container/10 border border-white/5 transition-all group active:scale-95">';
         html += '<div class="w-12 h-12 rounded-xl overflow-hidden ring-2 ring-white/10 group-hover:ring-primary/50 transition-all">';
-        html += uri ? '<img class="w-full h-full object-cover" src="' + uri + '"/>' : '<div class="w-full h-full bg-white/10"></div>';
+        html += '<img data-card-image="1" class="w-full h-full object-cover" src="' + uri + '"/>';
         html += '</div>';
         html += '<div class="flex-1 text-right">';
         html += '<p class="font-bold text-on-surface">' + name + '</p>';
