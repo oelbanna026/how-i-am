@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Alert } from 'react-native';
 import { StitchHtmlScreen, type StitchWebEvent } from '../components/StitchHtmlScreen';
+import { CARD_PLACEHOLDER_DATA_URI } from '../cardImages';
 import { gameActions, useGameStore } from '../gameStore';
 import { stitchUiHtml } from '../stitchUiAssets';
 import { audioService } from '../audio/audioService';
@@ -87,8 +88,10 @@ export function GameScreen({
   }, [isMyTurn]);
 
   const injected = useMemo(() => {
+    const placeholderImage = JSON.stringify(CARD_PLACEHOLDER_DATA_URI);
     return `
 (function () {
+  var PLACEHOLDER_IMAGE = ${placeholderImage};
   function onReady(fn) {
     if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', fn);
     else fn();
@@ -98,6 +101,40 @@ export function GameScreen({
   }
   function setText(el, t) {
     try { if (el) el.textContent = String(t ?? ''); } catch (e) {}
+  }
+  function rememberImage(el) {
+    try {
+      if (!el || el.getAttribute('data-rn-orig-src')) return;
+      el.setAttribute('data-rn-orig-src', el.getAttribute('src') || '');
+      el.setAttribute('data-rn-orig-class', el.className || '');
+    } catch (e) {}
+  }
+  function resetImage(el) {
+    try {
+      if (!el) return;
+      rememberImage(el);
+      el.setAttribute('src', el.getAttribute('data-rn-orig-src') || PLACEHOLDER_IMAGE);
+      el.className = el.getAttribute('data-rn-orig-class') || el.className || '';
+      el.style.filter = '';
+      el.style.opacity = '1';
+    } catch (e) {}
+  }
+  function loadImage(el, src) {
+    try {
+      if (!el) return;
+      rememberImage(el);
+      var nextSrc = String(src || '').trim() || PLACEHOLDER_IMAGE;
+      el.style.opacity = '1';
+      el.setAttribute('src', PLACEHOLDER_IMAGE);
+      var probe = new Image();
+      probe.onload = function () {
+        try { el.setAttribute('src', nextSrc); } catch (e) {}
+      };
+      probe.onerror = function () {
+        try { el.setAttribute('src', PLACEHOLDER_IMAGE); } catch (e) {}
+      };
+      probe.src = nextSrc;
+    } catch (e) {}
   }
   onReady(function () {
     try {
@@ -133,46 +170,36 @@ export function GameScreen({
 
         try {
           var img = document.querySelector('main img[alt="Blurred mystery object"]');
+          var opponentImg = document.querySelector('main img[alt="Opponent card"]');
           var helpIcon = document.querySelector('main span.material-symbols-outlined.animate-pulse');
           var title = document.querySelector('main h2');
           var sub = document.querySelector('main p');
-          if (img && !img.getAttribute('data-rn-orig-src')) {
-            img.setAttribute('data-rn-orig-src', img.getAttribute('src') || '');
-            img.setAttribute('data-rn-orig-class', img.className || '');
-          }
+          rememberImage(img);
+          rememberImage(opponentImg);
           if (!offline && typeof p.opponentImageUri === 'string' && p.opponentImageUri) {
-            if (img) {
-              img.setAttribute('src', p.opponentImageUri);
-              img.className = (img.getAttribute('data-rn-orig-class') || '').replace(/blur-3xl/g, '').replace(/opacity-60/g, 'opacity-95');
-              img.style.filter = 'brightness(0.55) contrast(1.15) saturate(1.05)';
-            }
-            if (helpIcon) helpIcon.style.display = 'none';
+            if (opponentImg) loadImage(opponentImg, p.opponentImageUri);
+            if (img) resetImage(img);
+            if (helpIcon) helpIcon.style.display = '';
             if (title && !answerMode) title.textContent = (typeof p.opponentName === 'string' && p.opponentName) ? ('خصمك: ' + p.opponentName) : 'خصمك';
             if (sub && !answerMode) sub.textContent = isMyTurn ? 'إسأل عشان تعرف نفسك' : 'جاوب على سؤاله';
             try {
-              if (title) title.style.textShadow = '0 6px 18px rgba(0,0,0,0.75)';
-              if (sub) sub.style.textShadow = '0 6px 18px rgba(0,0,0,0.75)';
+              if (title) title.style.textShadow = '';
+              if (sub) sub.style.textShadow = '';
             } catch (e) {}
           } else if (offline && !isMyTurn && typeof p.botImageUri === 'string') {
-            if (img) {
-              img.setAttribute('src', p.botImageUri);
-              img.className = (img.getAttribute('data-rn-orig-class') || '').replace(/blur-3xl/g, '').replace(/opacity-60/g, 'opacity-95');
-              img.style.filter = 'brightness(0.55) contrast(1.15) saturate(1.05)';
-            }
-            if (helpIcon) helpIcon.style.display = 'none';
+            if (opponentImg) loadImage(opponentImg, p.botImageUri);
+            if (img) resetImage(img);
+            if (helpIcon) helpIcon.style.display = '';
             if (title && typeof p.activeQuestionText === 'string' && p.activeQuestionText) title.textContent = p.activeQuestionText;
             else if (title) title.textContent = 'سؤال الكمبيوتر';
             if (sub) sub.textContent = 'جاوب: أيوه / لأ / ممكن / سكيب';
             try {
-              if (title) title.style.textShadow = '0 6px 18px rgba(0,0,0,0.75)';
-              if (sub) sub.style.textShadow = '0 6px 18px rgba(0,0,0,0.75)';
+              if (title) title.style.textShadow = '';
+              if (sub) sub.style.textShadow = '';
             } catch (e) {}
-          } else if (offline && isMyTurn) {
-            if (img) {
-              img.setAttribute('src', img.getAttribute('data-rn-orig-src') || img.getAttribute('src') || '');
-              img.className = img.getAttribute('data-rn-orig-class') || img.className || '';
-              img.style.filter = '';
-            }
+          } else {
+            if (img) resetImage(img);
+            if (opponentImg) resetImage(opponentImg);
             if (helpIcon) helpIcon.style.display = '';
             if (title) title.textContent = 'مين ده؟';
             if (sub) sub.textContent = 'إسأل زمايلك عشان تعرف';
