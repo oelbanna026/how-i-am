@@ -3,7 +3,8 @@ import { connectSocket, disconnectSocket, emitAck, getSocket, listenToEvents } f
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { loadProfile, resolveAvatar, saveProfile } from './profile';
 import { NativeModules, Platform } from 'react-native';
-import { offlineCards, offlineImageDataUri } from './offlineCards';
+import { normalizeCardCategory, normalizeCardImagePath, preloadImageUris, resolveCardImageUri } from './cardImages';
+import { offlineCards, offlineImageDataUri, pickDistinctOfflineCards, preloadOfflineCardDataUris } from './offlineCards';
 import { audioService } from './audio/audioService';
 import { voiceService } from './audio/voiceService';
 
@@ -101,19 +102,28 @@ function defaultServerUrl() {
 }
 
 function toAssetUrl(serverUrl: string, imagePath: string | null | undefined) {
+  const p = normalizeCardImagePath(imagePath);
+  if (!p) return null;
+  if (/^(?:https?:|data:|file:|blob:)/i.test(p)) return p;
   const base = String(serverUrl ?? '').replace(/\/+$/, '');
-  const p = String(imagePath ?? '').trim();
-  if (!base || !p) return null;
-  if (p.startsWith('http://') || p.startsWith('https://')) return p;
+  if (!base) return null;
   return `${base}${p.startsWith('/') ? '' : '/'}${p}`;
 }
 
 function normalizeCardForClient(serverUrl: string, card: any) {
   if (!card) return null;
-  const imagePath = typeof card.imagePath === 'string' ? card.imagePath : null;
-  const imageUri = toAssetUrl(serverUrl, imagePath);
-  if (!imageUri) return { ...card };
-  return { ...card, imageUri };
+  const imagePath = normalizeCardImagePath(card?.imagePath ?? card?.image ?? null);
+  const imageUri = resolveCardImageUri(serverUrl, card);
+  const category = normalizeCardCategory(card?.category);
+  const idValue = card?.id ?? card?._id ?? (card?.slug ? `${category}:${card.slug}` : null);
+  return {
+    ...card,
+    id: idValue ? String(idValue) : undefined,
+    category,
+    image: imagePath,
+    imagePath,
+    imageUri: imageUri ?? null
+  };
 }
 
 function normalizeServerUrlInput(raw: string) {
@@ -309,13 +319,6 @@ function upsertVoiceParticipant(state: VoiceState, patch: VoiceParticipant) {
 
 function removeVoiceParticipant(state: VoiceState, userId: string) {
   return { ...state, participants: state.participants.filter((p) => p.userId !== userId) };
-}
-
-function pickOfflineCard(category: string) {
-  const c = String(category ?? '').toLowerCase();
-  const pool = c && c !== 'all' ? offlineCards.filter((x) => String(x.category) === c) : offlineCards.slice();
-  if (!pool.length) return null;
-  return pool[Math.floor(Math.random() * pool.length)] ?? null;
 }
 
 function isOfflineRoom(room: any | null) {
@@ -606,18 +609,6 @@ function offlineApplyAnswerToCandidates(candidates: any[], questionText: string,
   return out;
 }
 
-function pickDistinctOfflineCards() {
-  const a = pickOfflineCard('all');
-  if (!a) return { userCard: null, botCard: null };
-  let b = pickOfflineCard('all');
-  let tries = 0;
-  while (b && a && String(b.slug) === String(a.slug) && tries < 10) {
-    b = pickOfflineCard('all');
-    tries += 1;
-  }
-  return { userCard: a, botCard: b && String(b.slug) !== String(a.slug) ? b : null };
-}
-
 class Store {
   state: GameStoreState;
   listeners = new Set<Listener>();
@@ -792,10 +783,15 @@ export const gameActions = {
           const normalizedPlayers = Array.isArray(payload?.players)
             ? payload.players.map((p: any) => ({ ...p, card: normalizeCardForClient(url, p?.card ?? null) }))
             : payload?.players;
-          const normalizedPayload = { ...payload, players: normalizedPlayers, myCard: normalizeCardForClient(url, myCard) };
+          const normalizedMyCard = normalizeCardForClient(url, myCard);
+          const normalizedPayload = { ...payload, players: normalizedPlayers, myCard: normalizedMyCard };
+          void preloadImageUris([
+            normalizedMyCard?.imageUri ?? null,
+            ...(Array.isArray(normalizedPlayers) ? normalizedPlayers.map((p: any) => p?.card?.imageUri ?? null) : [])
+          ]).catch(() => null);
           store.setState({
             gameState: normalizedPayload,
-            myCard: normalizeCardForClient(url, myCard),
+            myCard: normalizedMyCard,
             timer: buildTimerFromPayload(payload),
             messages: [
               { id: id(), ts: nowMs(), type: 'gameStart', text: 'Game started', payload },
@@ -810,6 +806,9 @@ export const gameActions = {
             ? payload.players.map((p: any) => ({ ...p, card: normalizeCardForClient(url, p?.card ?? null) }))
             : payload?.players;
           const normalizedPayload = { ...payload, players: normalizedPlayers };
+          void preloadImageUris(Array.isArray(normalizedPlayers) ? normalizedPlayers.map((p: any) => p?.card?.imageUri ?? null) : []).catch(
+            () => null
+          );
           store.setState({
             gameState: normalizedPayload,
             timer: buildTimerFromPayload(payload),
@@ -918,8 +917,8 @@ export const gameActions = {
                 ? 'تخمين غلط'
                 : `${winnerName} خمن غلط`;
             const targetName = typeof payload?.target?.name === 'string' ? payload.target.name : null;
-            const targetImagePath = typeof payload?.target?.imagePath === 'string' ? payload.target.imagePath : null;
-            const imageUri = targetImagePath ? toAssetUrl(s.serverUrl, targetImagePath) : null;
+            const imageUri = resolveCardImageUri(s.serverUrl, payload?.target ?? null);
+            void preloadImageUris([imageUri]).catch(() => null);
             return {
               ...s,
               gameState: s.gameState ? { ...(s.gameState as any), scores: payload?.scores ?? (s.gameState as any).scores } : s.gameState,
@@ -1023,7 +1022,11 @@ export const gameActions = {
     const userId = store.getState().userId;
     if (!userId) throw new Error('MISSING_USER_ID');
     const fallbackName = store.getState().profile.name;
-    const res = await emitAck<{ roomCode: string; sessionToken: string; voice?: any }>('createRoom', { ...args, userId });
+    const res = await emitAck<{ roomCode: string; sessionToken: string; voice?: any }>('createRoom', {
+      ...args,
+      category: normalizeCardCategory(args?.category),
+      userId
+    });
     void audioService.playSFX('join_room').catch(() => null);
     store.setState((s) => ({
       messages: [{ id: id(), ts: nowMs(), type: 'room', text: `Created room ${res.roomCode}`, payload: res }, ...s.messages].slice(0, 100),
@@ -1111,11 +1114,21 @@ export const gameActions = {
     const meName = store.getState().profile.name || 'Guest';
     const botId = 'bot_ai_1';
     const botName = 'AI Bot';
-    const { userCard, botCard } = pickDistinctOfflineCards();
+    const category = 'All';
+    const { userCard, botCard } = pickDistinctOfflineCards(category);
+    await preloadOfflineCardDataUris([userCard, botCard]);
     const userImg = await offlineImageDataUri(userCard?.imagePath ?? null);
     const botImg = await offlineImageDataUri(botCard?.imagePath ?? null);
     const myCard = userCard
-      ? { name: userCard.name, slug: userCard.slug, category: userCard.category, imagePath: userCard.imagePath, imageUri: userImg }
+      ? {
+          id: userCard.id,
+          name: userCard.name,
+          slug: userCard.slug,
+          category: userCard.category,
+          image: userCard.image,
+          imagePath: userCard.imagePath,
+          imageUri: userImg
+        }
       : { name: '—', category: 'All', imagePath: null, imageUri: null };
 
     stopOfflineClock();
@@ -1132,7 +1145,7 @@ export const gameActions = {
         maxPlayers: 2,
         flow: 'waiting',
         mode: 'Classic',
-        category: 'All',
+        category,
         isPublic: false
       },
       players: [
@@ -1160,9 +1173,24 @@ export const gameActions = {
           aiRecent: [],
           aiLastQuestionText: null,
           botCard: botCard
-            ? { name: botCard.name, slug: botCard.slug, category: botCard.category, imagePath: botCard.imagePath, imageUri: botImg }
+            ? {
+                id: botCard.id,
+                name: botCard.name,
+                slug: botCard.slug,
+                category: botCard.category,
+                image: botCard.image,
+                imagePath: botCard.imagePath,
+                imageUri: botImg
+              }
             : null,
-          aiCandidates: offlineCards.map((c) => ({ category: c.category, slug: c.slug, name: c.name, imagePath: c.imagePath }))
+          aiCandidates: offlineCards.map((c) => ({
+            id: c.id,
+            category: c.category,
+            slug: c.slug,
+            name: c.name,
+            image: c.image,
+            imagePath: c.imagePath
+          }))
         }
       },
       roundResult: null
